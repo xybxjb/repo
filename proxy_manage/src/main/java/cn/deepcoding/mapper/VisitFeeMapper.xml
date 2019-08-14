@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.VisitFeeDao">
+	<resultMap type="cn.deepcoding.model.VisitFee" id="visitFeeResult">
+		<id column="id" property="id"/>
+		<result column="ticket_amount" property="ticketAmount"/>
+		<result column="actual_amount" property="actualAmount"/>
+		<result column="reimbursement_mileage" property="reimbMileage"/>
+		<result column="reimbursement_voucher" property="reimbVoucher"/>
+		<association property="trans"   column="transportation_id" select="cn.deepcoding.dao.TransportationDao.getById"/> 
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.VisitFee" id="visitFeeResult2"  extends="visitFeeResult">
+	<association property="visitRecords"    column="visit_records_id" select="cn.deepcoding.dao.VisitRecordsDao.getById"/>
+	</resultMap>
+	
+	<select id="selectTransportation" resultMap="visitFeeResult" parameterType="cn.deepcoding.model.VisitFee">
+		select * from visit_fee  where visit_records_id=#{visitRecordsId}
+	</select>
+	<insert id="save" parameterType="cn.deepcoding.model.VisitFee">
+		insert into visit_fee (
+		visit_records_id,transportation_id,ticket_amount,actual_amount,reimbursement_mileage,reimbursement_voucher
+		) values
+		<foreach collection="visitFees" item="ss" separator="," >
+		(
+		#{ss.visitRecords.id},#{ss.trans.id},#{ss.ticketAmount},#{ss.actualAmount},#{ss.reimbMileage},#{ss.reimbVoucher}
+		)
+		</foreach>
+		
+	</insert>
+	<select id="get" parameterType="Integer" resultMap="visitFeeResult">
+	 		select * from visit_fee where id=#{id}
+	 </select>
+	 
+	 
+	 <delete id="delete"  parameterType="cn.deepcoding.model.VisitFee">
+	 
+	 delete from visit_fee where  visit_records_id=#{visitRecordsId}
+	 </delete>
+</mapper>

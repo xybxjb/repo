@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.GraduatedDao">
+	<resultMap type="cn.deepcoding.model.Graduated" id="Graduated">
+		<id property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="createTime" column="create_time" />
+		<result property="content" column="content" />
+		<result property="graduatedTime" column="gradution_time" />
+		<result property="pageView" column="page_view" />
+		<result property="elite" column="elite" />
+	</resultMap>
+
+
+
+
+	<!-- 根据条件查询 -->
+	<select id="listAll" resultMap="Graduated">
+		select * from graduated where 1=1
+		<if test="graduated.id!=null and graduated.id != ''">
+			AND id=#{graduated.id}
+		</if>
+		<if test="graduated.title != null and graduated.title != ''">
+			AND title like "%${graduated.title}%"
+		</if>limit #{page.start},#{page.rows}
+		;
+	</select>
+	<!-- 添加内容 -->
+	<insert id="addGraduated" useGeneratedKeys="true" keyProperty="graduated.id">
+		insert into graduated(title,create_time,content,gradution_time,page_view,elite,student_id)
+		values(#{graduated.title},#{graduated.createTime},#{graduated.content},#{graduated.graduatedTime},#{graduated.pageView},#{graduated.elite},#{graduated.student.id})
+	</insert>
+	<!-- 根据ID删除 -->
+	<delete id="deleteGraduated">
+		delete from graduated where id=#{id}
+	</delete>
+	<!--修改 -->
+	<update id="graduatedUpdate">
+		update graduated
+		<trim prefix="set" suffixOverrides=",">
+			<if test="title != null ">title=#{title},</if>
+			<if test="content != null ">content=#{content},</if>
+			<if test="graduatedTime != null ">gradution_time=#{graduatedTime},</if>
+			<if test="content != null ">content=#{content},</if>
+			<if test="elite != null ">elite=#{elite},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" resultType="Integer">
+		SELECT count(1) FROM
+		graduated ;
+	</select>
+
+
+   <!-- 点击 修改 点击量 -->
+   <update id="updateStudentpageView" parameterType="Integer">
+   	   update graduated set page_view=page_view+1 where id=#{id}
+   </update>
+   <!-- 定时随机添加 点击量 -->
+    <update id="updateStudentpageView2" parameterType="Integer">
+   	   update graduated set page_view=page_view+#{random} where id=#{id}
+   </update>
+
+
+   <!--查询就业精英信息  -->
+   <select id="getElite"  resultMap="Graduated">
+   		select * from graduated  where elite=1
+   </select>
+   <!-- 根据就业信息id查询就业信息 -->
+   <select id="getGraduatedById" parameterType="int" resultMap="Graduated">
+    select * from graduated where id=#{id}
+   </select>
+   <!-- 查询所有的就业信息倒序 -->
+   <select id="getallgraduated" resultMap="Graduated">
+    select * from graduated order by gradution_time desc
+   </select>
+   <!-- 只查询就业的id和title -->
+   <select id="getAllTitle" resultMap="Graduated">
+   select id,title, gradution_time from graduated
+   </select>
+   
+  <select id="getGraduatedByStudentId" resultMap="Graduated">
+  	select * from graduated where student_id=#{id}
+  </select>
+</mapper>

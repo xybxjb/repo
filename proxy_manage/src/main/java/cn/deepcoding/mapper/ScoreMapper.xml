@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ScoreDao">
+
+	<resultMap type="cn.deepcoding.model.Score" id="scoreResult">
+		<id property="id" column="id" />
+		<result property="score" column="score" />
+		<association property="course"  fetchType="eager" column="course_id"
+			select="cn.deepcoding.dao.CourseDao.getById"></association>
+		<association property="student" column="student_id" 
+			select="cn.deepcoding.dao.StudentDao.getById"></association>
+	</resultMap>
+
+	<resultMap type="cn.deepcoding.model.Score" id="scoreResult2"
+		extends="scoreResult">
+		<association property="exam" fetchType="eager" column="exam_id"
+			select="cn.deepcoding.dao.ExamDao.getById"></association>
+
+	</resultMap>
+
+	<!--添加考试信息 -->
+	<insert id="addScore">
+
+		insert into score (score,exam_id,course_id)
+		values(#{score},#{exam.id},#{course.id})
+
+	</insert>
+
+
+	<select id="getExamId" resultMap="scoreResult">
+		select * ,exam_id,
+
+ max(CASE course_id WHEN 27 THEN score ELSE 0 end)java,
+
+ max(CASE course_id WHEN 28 THEN score ELSE 0 end)h5,
+
+ max(CASE course_id WHEN 29 THEN score ELSE 0 end)mysql,  
+ max(CASE course_id WHEN 30 THEN score ELSE 0 end)javaweb, 
+ max(CASE course_id WHEN 31 THEN score ELSE 0 end)sshssm, 
+ max(CASE course_id WHEN 32 THEN score ELSE 0 end)training
+ from score where
+		exam_id=#{examId} GROUP BY course_id
+		
+	</select>
+	<!--通过考试Id 限制条件,分数查询 -->
+	<select id="getExamIdScore" resultMap="scoreResult">
+
+		select * from score where exam_id = #{examId} and course_id =(select id from
+		course where input_name =#{inputName} order by id)
+
+	</select>
+
+
+	<!-- 通过专业名称，学生id，考试id返回一条考试信息 -->
+	<select id="getScore" resultMap="scoreResult">
+
+		select * from score where exam_id = #{examId} and course_id =(select id from
+		course where input_name =#{inputName} and major_id = (select major_id
+		from student where id =#{studentId}))
+
+	</select>
+
+
+	<!--通过考试id获取各科成绩信息 -->
+	<select id="getById" resultMap="scoreResult">
+
+		select * from score where exam_id = #{id} order by course_id
+
+	</select>
+
+
+	<!--修改考试成绩 -->
+	<update id="update">
+
+		update score set score = #{fen} where exam_id = #{examId} and course_id =
+		#{courseId}
+
+	</update>
+
+	<select id="getScoreByCourseId" resultType="java.lang.Integer">
+
+		select score from score where course_id = #{courseId} and exam_id =
+		#{examId}
+
+	</select>
+
+
+	<!--通过学生姓名，课程名称，锁定课程id， 用于EXcel表导入 -->
+	<insert id="addExcelScore">
+		insert into score (exam_id,course_id,score)values(
+		#{examId},(select c.id from course c,student s where s.name=#{studentName} and
+		s.major_id = c.major_id and c.name=#{courseName}) ,#{score}
+		)
+	</insert>
+
+	<!--导入excel成绩前添加前查看此课程id是否存在，防止异常 -->
+	<select id="chaYan" resultType="java.lang.Integer">
+
+		select c.id from course c,student s where s.name=#{studentName} and
+		s.major_id = c.major_id and c.name=#{courseName}
+
+	</select>
+
+	<select id="haveScore" resultMap="scoreResult">
+
+		select * from score where exam_id = (select id from exam where name
+		=#{examName} and student_id = #{studentId}) and course_id =
+		#{courseId}
+
+	</select>
+
+
+	<!--通过score对象修改成绩 高 -->
+	<update id="updateScore">
+
+		update score set score = #{score} where id = #{id}
+
+	</update>
+
+
+	<select id="getStudentScore" resultType="java.lang.Integer">
+
+		select score from score where exam_id = (select id from exam where
+		student_id = #{student.id}
+
+		<if test="exam!=null and exam.name!=''">and name = #{exam.name}
+		</if>
+
+		<if test="exam==null">and name = ''</if>
+
+		)
+
+		and course_id = (select c.id from course c,student s where
+		s.id=#{student.id} and s.major_id =c.major_id and input_name
+		=#{course.inputName})
+
+	</select>
+
+	<select id=""></select>
+
+
+	<select id="getOneScore" resultMap="scoreResult">
+		select * from score where exam_id = (select id from exam where
+		student_id = #{studentId}
+		<if test="examName != null ">and name =#{examName}</if>
+		<if test="examName == null ">and name = '' </if>
+		)
+		and course_id in (select id from course where name = #{courseName})
+	</select>
+	
+	<!-- app  -->
+	<!-- 根据 试卷id 查询成绩 -->
+	<select id="getScoreByExamId" parameterType="Integer" resultType="java.lang.Integer">
+		select score from score where exam_id =#{examId}
+	</select>
+	<select id="getScoresByExamId" resultMap="scoreResult2">
+		select * from exam_score where exam_id=#{id}
+	</select>
+</mapper>

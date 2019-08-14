@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.PaymentDao">
+	<resultMap type="cn.deepcoding.model.Payment" id="PaymentResult">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+	</resultMap>
+
+		<select id="getById" resultMap="PaymentResult">
+			select *from payment where id= #{id}
+		</select>
+		
+		
+		<select id="getAll" resultMap="PaymentResult">
+			select *from payment 
+		</select>
+		
+		<!-- 添加支付方式 -->
+		<insert id="add" parameterType="Payment">
+		 	insert into payment (name) values(#{payment.name})
+		</insert>
+		<!-- 删除 -->
+		<delete id="delete" parameterType="int">
+			delete from payment where id=#{id}
+		</delete>
+		<!--回显  -->
+		<select id="findById" resultMap="PaymentResult" parameterType="int">
+			select * from payment where id=#{id}
+		</select>
+		<!--修改  -->
+		<update id="update" parameterType="Payment">
+			update payment set name =#{payment.name} where id=#{payment.id}
+		</update>
+		<!--模糊搜索  -->
+		<select id="getByName" parameterType="Payment" resultMap="PaymentResult">
+			select * from payment 
+			<where>
+				<if test="payment.name !=null and payment.name.trim() !=''">
+				name like "%"#{payment.name}"%"
+				</if>
+			</where>
+		</select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.TransportationDao">
+	
+	
+	<resultMap type="cn.deepcoding.model.Transportation" id="transportationResult">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+	</resultMap>
+	
+	<select id="getById" resultMap="transportationResult" parameterType="cn.deepcoding.model.Transportation">
+		
+		select * from transportation where id=#{id}
+	</select>
+	
+	<select id="getAll"  resultMap="transportationResult">
+		select * from transportation
+	</select>
+	<insert id="save">
+		insert into transportation(name)values(#{name})
+	</insert>
+	<update id="update">
+		update transportation set name=#{name} where id=#{id}
+	</update>
+	<delete id="delete">
+		delete from transportation where id = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.deepcoding.dao.StudentDormitoryDao">
+	<resultMap type="cn.deepcoding.model.StudentDormitory" id="FindStudentDormitory">
+
+		<id column="id" property="id" />
+
+		<result column="start_time" property="starttime" />
+		<result column="end_time" property="endtime" />
+		<result column="dormitory_leader" property="dormitoryleader" />
+		<association property="student" column="student_id"
+			select="cn.deepcoding.dao.StudentDao.getById"></association>
+		 <collection property="dormitroy" column="dormitroy_id"
+			select="cn.deepcoding.dao.DormitoryDao.GetById"></collection> 
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.StudentDormitory" id="FindDormitory">
+		<id column="id" property="id" />
+		<result column="start_time" property="starttime" />
+		<result column="end_time" property="endtime" />
+		<result column="dormitory_leader" property="dormitoryleader" />
+		<association property="dormitroy" column="dormitory_id"
+		select="cn.deepcoding.dao.DormitoryDao.GetStudentId" >
+		</association>
+
+	</resultMap>
+
+
+	<select id="FindStudentDormitoryBydid" resultMap="FindStudentDormitory">
+
+		SELECT * FROM
+		student_dormitory WHERE `dormitory_id`=#{id} and end_time IS NULL;
+	</select>
+
+	<insert id="StudentDormitoryAdd" parameterType="cn.deepcoding.model.StudentDormitory">
+
+		INSERT INTO
+		student_dormitory(dormitory_id,student_id,start_time,dormitory_leader)
+		VALUES(#{dormitroy.id},#{student.id},#{starttime},#{dormitoryleader});
+
+	</insert>
+
+
+
+	<update id="UpdatestudentdormitoryBySidAndDid" parameterType="cn.deepcoding.model.StudentDormitory">
+		update student_dormitory
+		<trim prefix="set" suffixOverrides=",">
+			<if test="endtime !=''">end_time=#{endtime},</if>
+			<if test="dormitoryleader!=null and dormitoryleader !=''">dormitory_leader=#{dormitoryleader},</if>
+		</trim>
+		WHERE student_id=#{student.id} AND
+		`dormitory_id`=#{dormitroy.id} ;
+	</update>
+
+
+
+	<!--修改宿舍长信息,根据宿舍ID -->
+	<update id="DormitorylleaderSystemByid" parameterType="cn.deepcoding.model.StudentDormitory">
+		update
+		student_dormitory set dormitory_leader=#{dormitoryleader} WHERE
+		id=#{id};
+	</update>
+	<!--修改宿舍长信息,根据学生ID -->
+	<update id="DormitorylleaderSystemBysid" parameterType="cn.deepcoding.model.StudentDormitory">
+		update
+		student_dormitory set dormitory_leader=#{dormitoryleader} WHERE
+		student_id=#{student.id};
+	</update>
+	<!-- 根据记录ID,添加endtime -->
+
+
+	<update id="UpdatestudentdormitorById" parameterType="cn.deepcoding.model.StudentDormitory">
+		update
+		student_dormitory set end_time=#{endtime} WHERE id=#{id};
+	</update>
+
+
+	<select id="getBoarder" resultMap="FindDormitory">
+		select * from student_dormitory where student_id=#{id}
+	</select>
+
+</mapper>
+

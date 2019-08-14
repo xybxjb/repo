@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.deepcoding.dao.StudentConversationDao">
+	<resultMap type="cn.deepcoding.model.StudentConversation" id="studentConversationResult">
+		<id property="id" column="id" />
+		<result property="teacherName" column="teacher_name" />
+		<result property="reason" column="reason" />
+		<result property="studentAttitude" column="student_attitude" />
+		<result property="conversationTime" column="conversation_time" />
+		<result property="expected" column="expected" />
+		<result property="pic" column="pic" />
+		<association property="student" column="student_id"
+			select="cn.deepcoding.dao.StudentDao.getById"></association>
+	</resultMap>
+	<!-- 查询所有学生谈话记录信息 -->
+	<select id="getAll" parameterType="cn.deepcoding.model.StudentConversation"
+		resultMap="studentConversationResult">
+		select * from student_conversation AS a INNER JOIN (SELECT id FROM student as b 
+		<where>
+			<if
+				test="studentConversation.student != null and studentConversation.student.name != null">
+				b.name like concat("%",#{studentConversation.student.name},"%")
+			</if>
+		</where>
+		)
+		b ON a.student_id=b.id
+		limit #{page.start},#{page.rows}
+	</select>
+	<select id="FindDormitorynumber" parameterType="cn.deepcoding.model.StudentConversation"
+		resultMap="studentConversationResult">
+		select * from student_conversation
+		<where>
+			<if
+				test="studentConversation.student != null and studentConversation.student.id != null">
+				student_id =#{studentConversation.student.id}
+			</if>
+		</where>
+		;
+	</select>
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.StudentConversation"
+		resultType="Integer">
+		select count(1) from student_conversation AS a INNER JOIN (SELECT id FROM student as b 
+		<where>
+			<if test="student != null and student.name != null">
+				b.name like concat("%",#{student.name},"%")
+			</if>
+		</where>
+		)b ON a.student_id=b.id
+	</select>
+	<!-- 根据id 查询 -->
+	<select id="getById" parameterType="Integer" resultMap="studentConversationResult">
+		select *
+		from student_conversation where id=#{id}
+	</select>
+	<!-- 修改信息 -->
+	<update id="updateStudentConversation">
+		update
+		student_conversation set
+		student_id=#{student.id},teacher_name=#{teacherName},reason=#{reason},student_attitude=#{studentAttitude},
+		conversation_time=#{conversationTime},expected=#{expected},pic=#{pic}
+		where id=#{id}
+	</update>
+	<!-- 添加谈话记录 -->
+	<insert id="AddStudentConversation" parameterType="cn.deepcoding.model.StudentConversation">
+		insert into
+		student_conversation
+		(id,student_id,teacher_name,reason,student_attitude,conversation_time,expected,pic)
+		values(#{id},#{student.id},#{teacherName},#{reason},#{studentAttitude},#{conversationTime},#{expected},#{pic})
+	</insert>
+	<!-- 删除学生信息 -->
+	<delete id="deleteStudentConversation" parameterType="Integer">
+		delete from
+		student_conversation where id=#{id}
+	</delete>
+	
+	
+	<!-- 查询单个学生的所有谈话记录 -->
+	<select id="getById2" parameterType="Integer" resultMap="studentConversationResult">
+		select
+		id,teacher_name,reason,student_attitude,conversation_time,expected
+		from student_conversation where student_id = #{id}
+	</select>
+	
+	<select id="getPicById" parameterType="Integer" resultType="String">
+		select pic from student_conversation where id = #{id}
+	</select>
+	
+</mapper>

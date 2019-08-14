@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.StudentDao">
+	<resultMap type="cn.deepcoding.model.Student" id="student">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="sex" property="sex" />
+		<result column="age" property="age" />
+		<result column="idcard" property="idCard" />
+		<result column="birthday" property="birthday" />
+		<result column="tel" property="tel" />
+		<result column="address" property="address" />
+		<result column="join_time" property="joinTime" />
+		<result column="relation" property="relation" />
+		<result column="idcard_pic" property="idCardPic" />
+		<result column="idcard_pic2" property="idCardPic2" />
+		<result column="simulation_classroom_id" property="simulationClassroom" />
+		<result column="before_address" property="beforeAddress" />
+		<result column="unpaiTuition" property="unpai_tuition" />
+		<result column="number" property="number" />
+		<result column="degree" property="degree" />
+		<result column="tuition" property="tuition" />
+		<result column="quarterage" property="quarterage" />
+		<result column="incidentals" property="incidentals" />
+		<result column="original_major" property="originalMajor" />
+		<result property="education" column="education" />
+		<result property="studyTime" column="study_time" />
+		<result property="transportation" column="transportation" />
+		<result property="dormitorynote" column="dormitorynote" />
+		<result property="initialResideDate" column="initialResideDate"/>
+		<result property="remarks" column="remarks"/>
+		<!--2019-02-25是否添加提成 -->
+		<result column="commission" property="commission" />
+		<!-- 是否就业 -->
+		<result property="findJob" column="findJob" />
+		<result column="commission" property="commission" />
+		<!-- 学生照片 -->
+		<result column="picture" property="picture" />
+		<association property="major" column="major_id"
+			select="cn.deepcoding.dao.MajorDao.getById" />
+		<association property="classroom" column="classroom_id"
+			select="cn.deepcoding.dao.ClassroomDao.getById" />
+		<association property="teacher" column="teacher_id"
+			select="cn.deepcoding.dao.TeacherDao.getById" />
+		<association property="advisoryTeacher" column="advisory_teacher_id"
+			select="cn.deepcoding.dao.AdvisoryTeacherDao.getById" />
+		<association property="proxyTeacher" column="proxy_teacher_id"
+			select="cn.deepcoding.dao.ProxyTeacherDao.get" />
+		<collection property="persons" column ="id"
+			select="cn.deepcoding.dao.EmergencyPersonDao.emergencyPersonPersonById" />
+	</resultMap>
+
+
+	<!--王晓宇 -->
+	<select id="getAll" resultMap="student">
+		select *from student where 1=1
+		<trim>
+			<if test="stuName!=null and  stuName!=''">
+				and name like "%${stuName}%"
+			</if>
+			<if test="stuIdCard!=null and  stuIdCard!=''">
+				and idCard =#{stuIdCard}
+			</if>
+			ORDER BY join_time DESC
+		</trim>
+	</select>
+
+	<select id="getByName" resultMap="student">
+		select * from student where
+		name like "%${name}%"
+	</select>
+
+	<select id="getByClassId" resultMap="student">
+		select * from student where
+		classroom_id=#{id}
+	</select>
+
+	<!-- 姓名模糊查询 并按专业进行排序 -->
+	<select id="getStudent" resultMap="student">
+		select * from student where
+		name like "%${name}%" order by major_id
+	</select>
+
+	<resultMap type="cn.deepcoding.model.Student" id="student2">
+		<result column="name" property="name" />
+		<result column="age" property="age" />
+		<result column="ding_id" property="dingId" />
+		<result column="join_time" property="joinTime" />
+		<association property="major" column="major_id"
+			select="cn.deepcoding.dao.MajorDao.getById" />
+		<association property="classroom" column="classroom_id"
+			select="cn.deepcoding.dao.ClassroomDao.getById" />
+		<association property="teacher" column="teacher_id"
+			select="cn.deepcoding.dao.TeacherDao.getById" />
+	</resultMap>
+
+	<!-- 保存学生信息 -->
+	<insert id="save" useGeneratedKeys="true" keyColumn="id"
+		keyProperty="id" parameterType="cn.deepcoding.model.Student">
+		insert into student
+		(name,sex,idCard,age,birthday,tel,address,join_time,commission,initialResideDate,
+		<if test="education!=null and education!=''">education,</if>
+		<if test="picture!=null and picture!=''">picture,</if>
+		<if test="degree!=''">degree,</if>
+		<if test="originalMajor!='' and originalMajor!=null">original_major,</if>
+		<if test="number!=null">number,</if>
+		study_time,major_id,tuition,classroom_id,teacher_id,advisory_teacher_id,proxy_teacher_id,
+		<if test="relation!=''">relation,</if>
+		before_address,transportation,incidentals,quarterage
+		<if test="remarks!=''">,remarks</if>
+		<if test="idCardPic != ''">,idcard_pic</if>
+		<if test="idCardPic2 != ''">,idcard_pic2</if>
+		
+		
+		)
+		values(
+		#{name},#{sex},#{idCard},#{age},#{birthday},#{tel},#{address},#{joinTime},#{commission},#{initialResideDate},
+		<if test="education!=null and education!=''"> #{education},</if>
+		<if test="picture!=null and picture!=''">#{picture},</if>
+		<if test=" degree!=''">#{degree},</if>
+		<if test="originalMajor!='' and originalMajor!=null">#{originalMajor},</if>
+		<if test="number!=null">#{number},</if>
+		#{studyTime},#{major.id},#{tuition},#{classroom.id},#{teacher.id},#{advisoryTeacher.id},#{proxyTeacher.id}
+		<if test="relation!=''">,#{relation}</if>
+		,#{beforeAddress},#{transportation},#{incidentals},#{quarterage},#{remarks}
+		<if test="idCardPic != ''">,#{idCardPic}</if>
+		<if test="idCardPic2 != ''">,#{idCardPic2}</if>
+	
+		
+		)
+	</insert>
+
+	<!-- 修改学生信息 -->
+	<update id="update">
+		update student
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null and name.trim()!=''">name=#{name},</if>
+			<if test="idCard != null and idCard.trim()!=''">idcard=#{idCard},</if>
+			<if test="age != null ">age=#{age},</if>
+			<if test="tel != null and tel.trim()!=''">tel=#{tel},</if>
+			<if test="classroom != null ">classroom_id=#{classroom.id},</if>
+			<if test="major != null ">major_id=#{major.id},</if>
+			<if test="tuition != null">tuition=#{tuition},</if>
+			<if test="quarterage != null">quarterage=#{quarterage},</if>
+			<if test="initialResideDate != null">initialResideDate=#{initialResideDate},</if>
+			<if test="incidentals != null">incidentals=#{incidentals},</if>
+			<if test="studyTime != null">study_time=#{studyTime},</if>
+			<if test="proxyTeacher != null ">proxy_teacher_id=#{proxyTeacher.id},</if>
+			<if test="birthday!= null">birthday=#{birthday},</if>
+			<if test="address != null and address.trim()!=''">address=#{address},</if>
+			<if test="dormitorynote != null and dormitorynote!=''">dormitorynote=#{dormitorynote},</if>
+			<if test="remarks != null and remarks !=''">remarks=#{remarks},</if>
+		</trim>
+		where id=#{id}
+	</update>
+
+ 	<select id="listAll" resultMap="student">
+		select * from student where 1=1
+		<if test="stuName != null and stuName.trim()!=''">
+			and name like "%${stuName}%"</if>
+		<if test="stuIdCard != null and stuIdCard.trim()!=''">
+			and idCard=#{stuIdCard}
+		</if>
+		order by join_time desc
+	</select> 
+	<!-- 通过id获取一个学生对象 -->
+	<select id="getById" resultMap="student">
+		select * from student where
+		id=#{id}
+	</select>
+	<!-- 获取学生DingID集合 -->
+	<select id="listDingId" resultType="String">
+		select ding_id from student
+	</select>
+
+	<!-- 通过学生姓名班级查找 （高） -->
+	<select id="getSomeStudents" resultMap="student2">
+		select * from student where 1=1
+		and name like "%${student.name}%"
+		<if test="student.classroom!=null">and classroom_id = #{student.classroom.id}</if>
+		order by major_id limit #{page.start},#{page.rows}
+	</select>
+	
+	
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.Student"
+		resultType="Integer">
+		SELECT count(1) FROM student;
+	</select>
+
+	<select id="getByClassIdLimit" resultMap="student2">
+		select * from student
+		where classroom_id=#{classId} limit #{page.start},#{page.rows}
+	</select>
+
+	<!-- 通过班级id,专业，名字获取学生 -->
+	<select id="getByClassIdMaId" resultMap="student2">
+		select * from student where simulation_classroom_id is null
+
+		<if test="majorId!=null and majorId!=''">
+			and major_id=#{majorId}
+		</if>
+		<if test="classId!=null and classId!=''">
+			and classroom_id=#{classId}
+		</if>
+		<if test="studentName!=null and studentName!=''">
+			and name like "%${studentName}%"
+		</if>
+                limit #{page.start},#{page.rows}
+	</select>
+	<select id="getStudengCountByClassId" resultType="int">
+		select
+		count(name) from student where classroom_id =#{calssId}
+	</select>
+	<select id="getByNameAndPhone" resultType="java.lang.String">
+		select ding_id from
+		student where name =#{name} and tel = #{tel}
+	</select>
+
+
+	<!-- 通过班级id获取该班学生 并按专业进行排序 -->
+	<select id="getClassStudents" parameterType="java.lang.Integer"
+		resultMap="student2">
+		select * from student where classroom_id = #{id} order by
+		major_id
+	</select>
+
+	<select id="getTelByName" parameterType="java.lang.String"
+		resultMap="student2">
+		select tel,sex,findJob from student where name=#{name}
+	</select>
+
+	<!--通过姓名查看是否有重复 -->
+	<select id="getNumber" resultMap="student2">
+		select * from student where
+		name = #{name}
+	</select>
+
+	<!-- 设置模拟班级id -->
+	<update id="updateTestClassId">
+		update student set simulation_classroom_id=#{testClassId} where
+		id in
+		<foreach collection="studentIds" item="studentId" open="("
+			close=")" separator=",">
+			#{studentId}
+		</foreach>
+	</update>
+
+	<!--获取所有的模拟班级Id -->
+	<select id="listTestClassroomId" resultType="Integer">
+		select sex,findJob,
+		simulation_classroom_id from student where simulation_classroom_id!=''
+		group by simulation_classroom_id
+	</select>
+
+	<!-- 通过模拟班级Id获取学生 -->
+	<select id="getByTestClassId" resultMap="student2">
+		select id,name,sex,findJob from
+		student where simulation_classroom_id=#{testClassroomId}
+	</select>
+
+	<select id="select" resultMap="student2">
+		select * from student
+		<if test="name != null and name != ''">
+			and s.name LIKE "%"#{name}"%"
+		</if>
+		<if test="sex != null and sex != ''">
+			and s.sex LIKE "%"#{sex}"%"
+		</if>
+		<if test="idcard != null and idcard != ''">
+			and s.idcard = #{idcard}
+		</if>
+	</select>
+	<!-- 移除模拟班级Id -->
+	<update id="deleteTestClassId">
+		update student set simulation_classroom_id=null where
+		id=#{id}
+	</update>
+	<!-- 添加学生Dingid信息 -->
+	<update id="updateDingId">
+		update student set ding_id = #{userId} where name
+		=#{name} and ding_id is
+		NULL
+	</update>
+	<!-- 通过学生姓名以及电话添加学生Dingid信息 -->
+	<update id="updateDingIdByNameTel">
+		update student set ding_id =#{userId} where name
+		=#{name} and tel = #{tel}
+	</update>
+	<!-- 查询重复学生姓名 -->
+	<select id="countByName" resultType="int">
+		select count(id) from
+		student where name =#{name} and ding_id is NULL
+	</select>
+	<!-- 查询没有DingID的学生 -->
+	<select id="getNameTel" resultMap="student2">
+		select name ,tel,sex,findJob from student
+		where ding_id is null
+	</select>
+	<!-- 将模拟班级设置为实际班级,并清空模拟班级id -->
+	<update id="updateClassId">
+		update student set
+		classroom_id=#{testClassId},simulation_classroom_id=null where
+		id in
+		<foreach collection="studentIds" item="studentId" open="("
+			close=")" separator=",">
+			#{studentId}
+		</foreach>
+	</update>
+
+
+	<select id="getOneStudent" resultMap="student">
+		select
+		s.id,
+		s. NAME,
+		s.age,
+		s.sex,
+		s.idcard,
+		s.address,
+		s.join_time,
+		s.tel,
+		s.tuition,
+		s.incidentals,
+		s.quarterage,
+		s.major_id,
+		s.classroom_id,
+		s.study_time,
+		s.initialResideDate
+		from
+		student s
+		where
+		id=#{id}
+
+	</select>
+
+	<!-- 根据招生老 编号 获取学生信息 -->
+	<select id="getStudentByProxyTeacherId" resultType="java.util.HashMap">
+		SELECT id,name,sex,findJob,join_time,address from student WHERE
+		proxy_teacher_id=#{proxyTeacherId} ORDER BY join_time DESC
+		limit #{page.start},#{page.rows}
+	</select>
+	<!-- 根据招生老 编号 获取学生信息的个数 -->
+	<select id="getStudentCountByProxyTeacherId" parameterType="Integer"
+		resultType="Integer">
+		SELECT count(1) from student WHERE proxy_teacher_id=#{proxyTeacherId}
+	</select>
+	<!-- 查询学生部分信息 -->
+	<select id="getStudentById2" parameterType="Integer" resultType="java.util.HashMap">
+		SELECT
+		id,name,sex,join_time,tel,address,tuition,quarterage,incidentals,unpai_tuition,idcard,initialResidetDate
+		from student WHERE id=#{id}
+	</select>
+	<!-- app -->
+	<!-- 根据招生老 编号 获取学生信息 -->
+	<select id="getStudentByProxyTeacherId2" parameterType="Integer" resultMap="student">
+		SELECT id,name,sex,findJob,major_id,study_time,findJob from student WHERE
+		proxy_teacher_id=#{proxyTeacherId} ORDER BY join_time DESC
+		limit #{page.start},#{page.rows}
+	</select>
+	<!-- 根据学生 id 查询学生部分信息 -->
+	<select id="getStudentById3" parameterType="Integer" resultMap="student">
+		SELECT
+		id,name,sex,join_time,tel,address,tuition,proxy_teacher_id,major_id,study_time,findJob
+		from student WHERE id=#{id}
+	</select>
+	<!-- 根据学生 id 查询学生考勤信息 -->
+	<select id="getAttenceByStudentId" parameterType="Integer" resultMap="student2" >
+		select ding_id,join_time,name from student where id=#{id}
+	</select>
+	<!-- 查询所有 学生 的部分信息 -->
+	<select id="getAttenceByStudent" resultMap="student2">
+		select ding_id,name from student
+	</select>
+
+	<!-- 删除学生信息 -->
+	<delete id="deleteStudent" parameterType="Integer">
+		delete from student where id=#{id}
+	</delete>
+	<!--查所有  -->
+	<select id="findAll" resultMap="student">
+		select * from student 
+	</select> 
+	<!-- 通过学生姓名查找联系方式 -->
+	<select id="findStuByName" resultMap="student">
+		select * from student where id=#{student.id}
+	</select>
+	
+	<update id="updateFindJob">
+		update student set findJob=2 where id=#{graduated.student.id}
+	</update>
+
+	<!-- 根据招生老 编号 获取学生信息 -->
+	<select id="getStudentCheckingInByUserId"  resultMap="student">
+		SELECT id,name from student WHERE proxy_teacher_id=#{proxyTeacherId}
+
+ 	</select>
+
+		
+
+	<!-- 学生姓名模糊查询  -->
+	<select id="likeStuName" resultMap="student">
+		select * from student where proxy_teacher_id = #{proxyTeacherId}
+		<if test="stuName != null and stuName.trim()!=''">
+			and name like "%${stuName}%"
+		</if>
+	</select>
+	
+	 <select id="getGraduated" resultMap="student">
+   	select * from student s,graduated g where s.id=g.student_id 
+   		<if test="name!=null and name.trim()!=''">
+   			and s.name like concat('%',#{name},'%')
+   		</if>
+   		<if test="address!=null and address.trim()!=''">
+   			and s.address like concat('%',#{address},'%')
+  		</if>
+   
+   </select>
+</mapper>

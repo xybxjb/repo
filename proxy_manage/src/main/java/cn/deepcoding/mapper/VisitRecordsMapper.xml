@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.VisitRecordsDao">
+	<resultMap type="VisitRecords" id="visitRecordsResult">
+		<id column="id" property="id"/>
+		<result column="start_from_address" property="startFromAddress"/>
+		<result column="purpose" property="purpose"/>
+		<result column="datetime" property="dateTime"/>
+		<result column="reimbursement_voucher" property="reimVoucher"/>
+		<result column="reimbursement_amount" property="reimAmount"/>
+		<result column="reimbursement_time" property="reimTime"/> 
+		<result column="bank_name" property="bankName"/>
+		<result column="bank_card_number" property="bankCardNumber"/>
+		<result column="opening_bank" property="openingBank"/>
+		<result column="audit_state" property="auditState"/>
+		<association property="proxyTeacher" column="proxy_teacher_id" select="cn.deepcoding.dao.ProxyTeacherDao.getById"/>
+		<association property="visitFee"  column="id" select="cn.deepcoding.dao.VisitFeeDao.selectTransportation"/>
+	</resultMap>
+
+	<select id="selectPurpose" resultMap="visitRecordsResult" parameterType="cn.deepcoding.model.VisitRecords">
+		select * from visit_records where visit_records.proxy_teacher_id=#{proxyTeacherId}
+	</select>
+	<!-- 获取所有数据 -->
+	<select id="getAll" resultMap="visitRecordsResult">
+		select * from visit_records 
+	</select>
+	<insert id="save" parameterType="cn.deepcoding.model.VisitRecords"  useGeneratedKeys="true"  keyColumn="id"  keyProperty="id">
+		insert into visit_records (
+		start_from_address,
+		purpose,
+		datetime,
+		reimbursement_voucher,
+		reimbursement_amount,
+		audit_state,
+		bank_name,bank_card_number,opening_bank,
+		proxy_teacher_id
+		) values (
+		#{startFromAddress},
+		#{purpose},
+		#{dateTime},
+		#{reimVoucher},
+		#{reimAmount},
+		'0',
+		#{bankName},#{bankCardNumber},#{openingBank},
+		#{proxyTeacher.id}
+		)
+	</insert>
+	
+	<update id="update"  parameterType="cn.deepcoding.model.VisitRecords">
+	
+	update visit_records set
+		start_from_address = #{startFromAddress},
+		purpose = #{purpose},
+		datetime = #{dateTime},
+		reimbursement_amount = #{reimAmount},
+		bank_name =#{bankName},
+		bank_card_number = #{bankCardNumber},
+		opening_bank=#{openingBank}
+		where id =#{id} 
+	</update>
+	
+	
+	
+	<select id="getById" resultMap="visitRecordsResult">
+		select * from visit_records where id=#{id}
+	</select>
+
+	<select id="getVisitRecords"  resultMap="visitRecordsResult">
+	select * from visit_records where 
+	proxy_teacher_id in (select id from proxy_teacher where name like "%${name}%")
+	<if test="purpose!=null and purpose!=''">and purpose = #{purpose}</if>
+	<if test="beginDateTime!=null and beginDateTime!=''"> and datetime &gt;= #{beginDateTime}  </if>
+	<if test="endDateTime!=null and endDateTime!=''">and datetime &lt;= #{endDateTime} </if>
+	<if test="startFromAddress1!=null and startFromAddress1 !=''">and start_from_address = #{startFromAddress1} </if>
+	</select>
+
+
+</mapper>

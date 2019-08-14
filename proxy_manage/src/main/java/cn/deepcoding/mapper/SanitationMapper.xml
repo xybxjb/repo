@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="cn.deepcoding.dao.SanitationDao">
+	<resultMap type="cn.deepcoding.model.Sanitation" id="sanitationResult">
+		<id column="id" property="id"/>
+		<result column="check_date" property="checkDate"/>
+		<result column="grade" property="grade"/>
+		<result column="check_person" property="checkPerson"/>
+		<result column="pic" property="pic"/>
+		<association property="dormitory" column="dormitory_id" select="cn.deepcoding.dao.DormitoryDao.GetById"/>
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.Sanitation" id="sanitationResult2">
+		<result column="extract(year_month from check_date)" property="checkDate"/>
+		<result column="COUNT(DISTINCT dormitory_id)" property="dId"/>
+		<result column="avg(grade)" property="grade"/>
+		<association property="dormitory" column="dormitory_id" select="cn.deepcoding.dao.DormitoryDao.GetById"/>
+	</resultMap>
+	<!-- 查询所有 -->
+	<select id="getAll" parameterType="cn.deepcoding.model.Sanitation" resultMap="sanitationResult">
+		select * from sanitation 
+		 <where>
+			<if test="sanitation.dId != null">
+				dormitory_id =#{sanitation.dId}
+			</if>
+			 <if test="sanitation.checkDate != null and  sanitation.checkDate !=''">
+				and extract(year_month from check_date) = #{sanitation.checkDate}
+			</if>
+		</where>
+		order by grade desc limit #{page.start},#{page.rows}
+	</select>
+	<!--  查询 分页个数 -->
+ 	<select id="getAllCount" parameterType="cn.deepcoding.model.Sanitation" resultType="Integer">
+		select count(1) from sanitation 
+			<where>
+				<if test="dId != null">
+					dormitory_id =#{dId}
+				</if>
+			</where>
+	</select> 
+	<!-- 平均分 >=80的宿舍个数-->
+	<select id="getCountA" parameterType="cn.deepcoding.model.Sanitation" resultMap="sanitationResult2">
+		select COUNT(DISTINCT dormitory_id),AVG(grade),dormitory_id,extract(year_month from check_date) from sanitation  
+			 <where>
+				<if test="checkDate != null and  checkDate !=''">
+					extract(year_month from check_date)=#{checkDate}
+				</if>
+			</where>
+			group by extract(year_month from check_date),dormitory_id HAVING AVG(grade)>=80
+	</select>
+	<!-- 平均分 >=60的宿舍个数-->
+	<select id="getCountB" parameterType="cn.deepcoding.model.Sanitation" resultMap="sanitationResult2">
+		select COUNT(DISTINCT dormitory_id),AVG(grade),dormitory_id,extract(year_month from check_date) from sanitation  
+			 <where>
+				<if test="checkDate != null and  checkDate !=''">
+					extract(year_month from check_date)=#{checkDate}
+				</if>
+			</where>
+			group by extract(year_month from check_date),dormitory_id HAVING AVG(grade) BETWEEN '60' AND '79'
+	</select>
+	<!-- 平均分 <60的宿舍个数-->
+	<select id="getCountC" parameterType="cn.deepcoding.model.Sanitation" resultMap="sanitationResult2">
+		select COUNT(DISTINCT dormitory_id),AVG(grade),dormitory_id,extract(year_month from check_date) from sanitation  
+			 <where>
+				<if test="checkDate != null and  checkDate !=''">
+					extract(year_month from check_date)=#{checkDate}
+				</if>
+			</where>
+			group by extract(year_month from check_date),dormitory_id HAVING AVG(grade) BETWEEN '00' AND '59'
+	</select>
+	<!-- 根据 id 查询 -->
+	<select id="getById" parameterType="Integer" resultMap="sanitationResult">
+		select * from sanitation where id=#{id}
+	</select>
+	<!-- 修改 -->
+	<update id="updateSanitation" parameterType="cn.deepcoding.model.Sanitation">
+		update sanitation set dormitory_id=#{dormitory.id},check_date=#{checkDate},grade=#{grade},
+		check_person=#{checkPerson},pic=#{pic} where id=#{id}
+	</update>
+	<!-- 添加 -->
+	<insert id="addSanitation" parameterType="cn.deepcoding.model.Sanitation">
+		insert into sanitation (id,dormitory_id,check_date,grade,check_person,pic) 
+		values(#{id},#{dormitory.id},#{checkDate},#{grade},#{checkPerson},#{pic})
+	</insert>
+	<!-- 删除 -->
+	<delete id="deleteSanitation" parameterType="Integer">
+		delete from sanitation where id=#{id}
+	</delete>
+</mapper>

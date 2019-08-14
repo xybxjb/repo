@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.FeeTypeDao">
+	<cache></cache>
+	<resultMap type="cn.deepcoding.model.FeeType" id="FeeTypeResult">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="create_time" property="createTime" />
+		<result column="add_date" property="addDate"/>
+		
+	</resultMap>
+	<insert id="save" parameterType="FeeType">
+		insert into fee_type(
+		<if test="addDate != null ">
+		add_date,
+		</if>
+		<if test="name != null and name.trim() !=''">
+		name
+		</if>
+		) values(<if test="addDate != null ">
+		#{addDate},
+		</if>
+		<if test="name != null and name.trim() !=''">
+		#{name}
+		</if>
+		)
+	</insert>
+	<select id="find" resultMap="FeeTypeResult">
+		select * from fee_type
+	</select>
+	<select id="get" resultMap="FeeTypeResult">
+		select * from fee_type where id = #{id}
+	</select>
+	<delete id="delete" >
+		delete from fee_type where id=#{id}
+	</delete>
+</mapper> 
+
+

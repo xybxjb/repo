@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.TeacherDao">
+	
+	<resultMap type="cn.deepcoding.model.Teacher" id="TeacherResult">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="state" column="state"/>
+	</resultMap>
+	<select id="getAll" resultMap="TeacherResult" flushCache="false" useCache="true">
+		select * from teacher
+	</select>
+	<select id="getById" resultMap="TeacherResult" flushCache="false" useCache="true">
+		select * from teacher where id = #{id}
+	</select>
+	<select id="getTeacherByClassroom" resultMap="TeacherResult" flushCache="false" useCache="true">
+		select t.* from teacher t where t.id in (SELECT teacher_id FROM teacher_classroom WHERE classroom_id = #{id} and end_time is null )
+	</select>
+	<select id="findTeachers" resultMap="TeacherResult">
+		select * from teacher where id in (select teacher_id from teacher_classroom where classroom_id = #{classroomId}) order by  id
+	</select>
+	
+	<delete id="delete" flushCache="false">
+		delete from teacher where id = #{id}
+	</delete>
+	
+	<insert id="save" flushCache="false">
+		insert into teacher(name,state) values(#{name},#{state})
+	</insert>
+	
+	<update id="update" flushCache="false">
+		update teacher set name = #{name},state = #{state} where id = #{id}
+	</update>
+	
+	<select id="getState" resultMap="TeacherResult" flushCache="false" useCache="true">
+		select * from teacher where state = 1
+	</select>
+</mapper>
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>推荐学生信息</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/information.css" />
+<script>
+			var html = document.getElementsByTagName('html')[0];
+			html.style.fontSize = html.clientWidth / 3.75 + "px";
+		</script>
+</head>
+<body>
+	<div class="w100">
+		<!-- <a class="f20 font_fam mt2 pl2 color80 dis_inlin_biock" href="javascript:0"><img class="w8" src="img/icon05_jt.png"/>　推荐学生信息</a> -->
+		<img class="w100 mt1" src="img/icon04.png" />
+		<div class="f16 mt2">
+			<p class="record pl2">
+				当前有<span class="font_a ts_stu"></span>条学员记录
+			</p>
+			<table class="stu_infor mt1 color80">
+				<thead>
+					<tr>
+						<th>头像</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>入学时间</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<a href="#top"></a>
+</body>
+</html>
+<script src="js/jquery-3.3.1.min.js" type="text/javascript"
+	charset="utf-8"></script>
+<script type="text/javascript">
+	
+	$(function(){
+		$.ajax({
+			url : "/proxy_manage/proxyTeacherWechat/getProxyTeacherID", //请求的url地址
+			type : "post",
+			success : function(date) {
+				console.log(date)
+				$.ajax({
+					type : "POST",
+					url : "/proxy_manage/proxyTeacherWechat/getStudentByProxyTeacherId",
+					data : {
+						proxyTeacherId:date,
+						page : 1,
+						rows : 1000
+					},
+					success : function(response){
+						console.log(response)
+						for(var i =0;i<response.rows.length;i++){
+							let moBan = `
+								<tr class="stu_message" id=${response.rows[i].id}>
+								<td><img src="img/icon06_tx.png"/></td>
+								<td>${response.rows[i].name}</td>
+								<td>${response.rows[i].sex}</td>
+								<td>${response.rows[i].join_time}</td>
+								</tr>`;
+							$('.stu_infor tbody').append(moBan);	
+						}
+						$('.ts_stu').text(response.total);
+					},
+					error : function(error){
+						console.log(error);
+					}
+				});
+				
+			}});
+		
+		
+		/*点击进入学生详情信息*/
+		$('.stu_infor tbody').on('click','.stu_message',function(){
+			var id = $(this).attr('id');
+			window.location.href="details.html?valus="+id;  
+		})
+	})
+</script>

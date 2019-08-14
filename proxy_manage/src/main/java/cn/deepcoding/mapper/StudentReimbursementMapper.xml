@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.StudentReimbursementDao">
+	<!--开启二级缓存 -->
+	<cache/>
+	<resultMap type="StudentReimbursement" id="StudentReimbursementResult">
+		<id property="id" column="id"/>
+		<result property="studentId" column="student_id"/>
+		<result property="actualObject" column="actual_object"/>
+		<result property="actualObjectTel" column="actual_object_tel"/>
+		<result property="billAmount" column="bill_amount"/>
+		<result property="amountReported" column="amount_reported"/>
+		<result property="ticketVoucher" column="ticket_voucher"/>
+		<result property="auditState" column="audit_state"/>
+		<result property="remarks" column="remarks"/>
+	</resultMap>
+	
+	 <select id="getTotal" resultType="int">
+		select count(1)from student_reimbursement where 1=1
+		<include refid="selectSql"></include>
+	</select>
+	<select id="list" resultMap="StudentReimbursementResult">
+		select * from student_reimbursement
+		<include refid="selectSql"></include>
+		limit #{page.start},#{page.rows}
+	</select>
+	<sql id="selectSql">
+		<if test="studentReimbursement.studentId != null and studentReimbursement.studentId.trim()!=''"> and student_id like concat('%',#{studentReimbursement.studentId},'%')</if>
+		<if test="studentReimbursement.actualObject != null and studentReimbursement.actualObject.trim()!=''"> and actual_object like concat('%',#{studentReimbursement.actualObject},'%')</if>
+		<if test="studentReimbursement.actualObjectTel != null and studentReimbursement.actualObjectTel.trim()!=''"> and actual_object_tel like concat('%',#{studentReimbursement.actualObjectTel},'%')</if>
+		<if test="studentReimbursement.billAmount != 0.0d"> and bill_amount </if>
+		<if test="studentReimbursement.amountReported != 0.0d"> and amount_reported </if>
+		<if test="studentReimbursement.ticketVoucher != null and studentReimbursement.ticketVoucher.trim()!=''"> and ticket_voucher like concat('%',#{studentReimbursement.ticketVoucher},'%')</if>
+		<if test="studentReimbursement.auditState != null and studentReimbursement.auditState.trim()!=''"> and audit_state like concat('%',#{studentReimbursement.auditState},'%')</if>
+		<if test="studentReimbursement.remarks != null and studentReimbursement.remarks.trim()!=''"> and remarks like concat('%',#{studentReimbursement.remarks},'%')</if>
+	</sql>
+	
+	<select id="StudentReimbursement" resultMap="StudentReimbursementResult">
+	    select * from student_reimbursement where audit_state =0;
+	</select>
+	
+	
+	<!-- 更新学生审核的状态 -->
+	<update id="update" parameterType="StudentReimbursement">
+		update student_reimbursement set 
+		<!-- trim方法把name字符串头尾的空格去掉 -->
+		<if test="auditState!=null">
+			 audit_state = #{auditState}
+		</if>
+		where student_id = #{studentId}
+	</update>
+	<insert id="save" parameterType="cn.deepcoding.model.StudentReimbursement">
+		insert into student_reimbursement (
+		<if test="studentId != null ">student_id,</if>
+		<if test="actualObject != null and actualObject.trim()!=''">actual_object,</if>
+		<if test="actualObjectTel != null and actualObjectTel.trim()!=''">actual_object_tel</if>
+		)
+		values(
+		<if test="studentId != null ">#{studentId},</if>
+		<if test="actualObject != null and actualObject.trim()!=''">#{actualObject},</if>
+		<if test="actualObjectTel != null and actualObjectTel.trim()!=''">#{actualObjectTel}</if>
+		)
+		
+	</insert>
+	
+	
+	<!-- 删除 -->
+	<delete id="deleteStudentreimbursement" parameterType="Integer">
+		delete from student_reimbursement  where student_id=#{id}
+	</delete>
+	
+</mapper>

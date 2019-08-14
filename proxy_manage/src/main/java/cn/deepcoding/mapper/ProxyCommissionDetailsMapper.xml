@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyCommissionDetailsDao">
+		
+		<!-- 通过姓名和身份证号查出某个招生老师的 id -->
+		<select id="findByName" resultType="integer">				
+			select id from proxy_teacher where name=#{name} and idcard=#{cid}
+		</select>
+		<select id="find" resultType="ProxyTeacher">				
+			select * from proxy_teacher where name=#{name} and idcard=#{cid}
+		</select>
+		
+		<!-- 通过招生老师的 id 查出他名下的学生 id老师的id -->
+		<select id="findByPtid" resultType="integer">				
+			select id from student where proxy_teacher_id=#{ptid}
+		</select>
+		
+		<!--  -->
+		<select id="findBySid" resultType="double">				
+			select sum(amount) from fee where type='学费' and student_id in 
+			<foreach collection="list" open="(" close=")" separator="," item="sids">
+				#{sids}
+			</foreach>
+		</select>
+		<resultMap type="cn.deepcoding.model.ProxyTeacherAmount" id="proxyteacheramount1">
+			<id property="id" column="id"/>
+			<result property="name" column="name"/>
+			<result property="address" column="address"/>
+			<result property="tel" column="tel"/>
+			<result property="point" column="point"/>
+			<collection property="ranks" column="rank_id" select="cn.deepcoding.dao.ProxyCommissionDao.selectRankId"></collection>
+
+			
+		</resultMap>	
+		<select id="findbyid" resultMap="proxyteacheramount1">				
+			select * from proxy_teacher where id in 
+			<foreach collection="li" index="index" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+			limit #{page.start},#{page.rows}
+		</select>
+		
+		<select id="gettotal1" resultType="integer">
+			select count(1) from proxy_teacher where id in 
+			<foreach collection="list" open="(" close=")" separator="," item="ids">
+				#{ids}
+			</foreach>
+		</select>
+		<resultMap type="cn.deepcoding.model.ProxyTeacher" id="ProxyTeacherResult">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="idcard" property="idcard"/>
+		<result column="sex" property="sex"/>
+		<result column="age" property="age"/>
+		<result column="tel" property="tel"/>
+		<result column="wechat" property="wechat"/>
+		<result column="qq" property="qq"/>
+		<result column="bankcard" property="bankcard"/>
+		<result column="address" property="address"/>
+		<result column="join_date" property="joinDate"/>
+		<result column="introducer_name" property="introducerName"/>
+		<result column="introducer_type" property="introducerType"/>
+		<result column="point" property="point"/>
+		<result column="remark" property="remark"/>
+		<result column="bank_name" property="bankName"/>
+		<result column="bank_card_number" property="bankCardNumber"/>
+		<result column="opening_bank" property="openingBank"/>
+		<result column="state" property="state"/>
+		<association property="ranks" column="rank_id" select="cn.deepcoding.dao.RankDao.getById"></association>
+	</resultMap>
+
+	<resultMap type="ProxyTeacher" id="LeaderResult" extends="ProxyTeacherResult">
+		<association fetchType="eager" notNullColumn="parent_proxy_teacher_id"
+			property="parentProxyTeacherId" column="parent_proxy_teacher_id"
+			select="cn.deepcoding.dao.ProxyTeacherDao.getParentProxyTeacherId">
+		</association>
+	</resultMap>
+	<select id="getParentProxyTeacherId" parameterType="java.lang.Integer"	resultMap="LeaderResult">
+		select * from proxy_teacher where parent_proxy_teacher_id=#{id}
+	</select>
+	
+	<select id="findById" resultType="ProxyTeacher">
+		select name,idcard from proxy_teacher where id=#{id}
+	</select>
+	
+	<resultMap type="cn.deepcoding.model.Student" id="student">
+		<id property="id" column="id"/>
+		<result property="unpaiTuition" column="unpai_tuition"/>
+		<!-- <collection property="proxyTeacher" column="proxy_teacher_id" select="cn.deepcoding.dao.ProxyCommissionDetailsDao.findProxyTeacher"/> --> 
+	</resultMap>
+	<!-- 每个学生未缴清的学费 -->
+	<select id="hasNotPaid" resultMap="student">
+		select id,unpai_tuition from student where unpai_tuition>0
+	</select>
+	
+	
+	 <select id="findProxyTeacher" resultType="ProxyTeacher">
+		select * from proxy_teacher where id=#{id}
+	</select> 
+	<resultMap type="cn.deepcoding.model.ProxyTeacherHistory" id="proxyTeacherHistory">
+		<id property="id" column="id"/>
+		<result property="proxyteacherId" column="proxyteacher_id"/>
+		<result property="proxyteacherName" column="proxyteacher_name"/>
+		<result property="commissionAmount" column="commission_amount"/>
+		<result property="commissionDate" column="commission_date"/>	
+	</resultMap>
+	<select id="createWage" resultMap="proxyTeacherHistory">
+		select proxyteacher_id,proxyteacher_name,sum(commission_amount)commissionAmount,commission_date from proxyteacher_commission_history
+		where year(NOW())=year(commission_date) and month(NOW())=month(commission_date) GROUP BY proxyteacher_id
+		limit #{page.start},#{page.rows}
+		
+	</select>
+	<select id="getTotal" resultType="Integer">
+		select count(1) from (select proxyteacher_id,proxyteacher_name,sum(commission_amount)commissionAmount,commission_date from proxyteacher_commission_history
+		where year(NOW())=year(commission_date) and month(NOW())=month(commission_date) GROUP BY proxyteacher_id) as aa
+	</select>
+	<select id="findByName2" resultMap="proxyteacheramount1">
+		select * from proxy_teacher where name=#{name} and idcard=#{cid}
+	</select>
+	<select id="getParentProxyTeacherId2" parameterType="java.lang.Integer"	resultMap="proxyteacheramount1">
+		select * from proxy_teacher where parent_proxy_teacher_id=#{id}
+	</select>
+	
+</mapper>

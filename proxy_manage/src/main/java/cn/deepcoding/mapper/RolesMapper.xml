@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.RolesDao">
+	<resultMap type="roles" id="rolesResultMap">
+		<id property="id" column="id"/>
+		<result property="rolename" column="role_name"/>
+		<result property="description" column="description"/>
+		<result property="available" column="available"/>
+		<collection property="Permissions" column="id" select="cn.deepcoding.dao.PermissionDao.getRolesIdToPermission"></collection>
+	</resultMap>
+	
+	<!-- 查询所有 -->
+	<select id="getAll" parameterType="cn.deepcoding.model.Roles" resultMap="rolesResultMap">
+		select * from roles
+		<where>
+			<if test="rolename != null and rolename != ''">
+				role_name like concat("%",#{rolename},"%")
+			</if>
+		</where>
+	</select>
+	<!-- 根据id 查询 -->
+	<select id="getById" parameterType="cn.deepcoding.model.Roles" resultMap="rolesResultMap">
+		select * from roles where id=#{id};;;;;;;;;;
+	</select>
+	<select id="findById" parameterType="cn.deepcoding.model.Roles" resultType="Roles">
+		select * from roles where id=#{id}
+	</select>
+	<!-- 添加 -->
+	<insert id="addRole" parameterType="cn.deepcoding.model.Roles">
+		insert into roles (id,role_name,description,available) values(#{id},#{rolename},#{description},#{available})
+	</insert>
+	<!-- 修改 -->
+	<update id="updateRole" parameterType="cn.deepcoding.model.Roles">
+		update roles set role_name=#{rolename},description=#{description},available=#{available} where id=#{id}
+	</update>
+	<!-- 删除 -->
+	<delete id="deleteRole" parameterType="Integer">
+		delete from roles where id=#{id}
+	</delete>
+	
+<!-- 	//通过角色ID删除所有权限  2019-08-6  -->
+	<delete id="deleteAll" parameterType="integer">
+		DELETE FROM roles_permissions WHERE role_id = #{id};
+	</delete>
+	<select id="getRoleByUserId" resultMap="rolesResultMap">
+		select r.* from roles r
+		join users_roles ur on r.id=ur.role_id
+		join users u on u.id=ur.user_id and u.id=#{userId} 
+	</select>
+	<!-- 根据 角色 id 权限ID添加角色权限关系 -->
+	<insert id="addByRoleId" parameterType="Integer">
+		INSERT INTO roles_permissions(role_id,permission_id) VALUES(#{rolesId},#{permissionId});
+	</insert>
+	<!-- 	//通过角色ID删除角色用户关系  2019-08-6  -->
+	<delete id="deleteUserRoleByRoleId" parameterType="integer">
+		DELETE FROM users_roles WHERE role_id = #{id};
+	</delete>
+	<!--根据 权限 id 和角色 id  删除关联信息 --> 
+	<delete id="deleteByRoleIdPermissionId" parameterType="integer">
+		DELECT FROM roles_permissions WHERE role_id = #{rolesId} AND permission_id = #{promissionId}
+	</delete>
+	<!-- 根据 角色 id 用户ID添加角色用户关系 -->
+	<insert id="addUserRoles" parameterType="Integer">
+		INSERT INTO users_roles(role_id,user_id) VALUES(#{rolesId},#{userId});
+	</insert>
+	<!-- 	//通过角色ID删除角色用户关系  2019-08-6  -->
+	<delete id="deleteByUserId" parameterType="integer">
+		DELETE FROM users_roles WHERE user_id = #{id};
+	</delete>
+	<!-- 	//	根据角色Id用户id删除角色用户关系  -->
+	<delete id="deleteByUserIdRoleId" parameterType="integer">
+		DELETE FROM users_roles WHERE user_id = #{userId} and role_id=#{rolesId};
+	</delete>
+</mapper>	

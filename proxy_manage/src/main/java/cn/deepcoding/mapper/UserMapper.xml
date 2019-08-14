@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.UserDao">
+	<resultMap type="user" id="user">
+		<id column="id" property="id"/>
+		<result column="username" property="username"/>
+		<result column="name" property="name"/>
+		<result column="sex" property="sex"/>
+		<result column="password" property="password"/>
+		<result column="phone" property="phone"/>
+		<result column="email" property="email"/>
+	</resultMap>
+	<select id="getTotal" resultType="int">
+		select count(1)from user u
+		<where>
+			<include refid="selectSql"></include>
+		</where>
+	</select>
+	<select id="findByPage" resultMap="user">
+		select u.id,u.name,u.sex,u.phone,u.email from user u 
+
+	<where>
+			<include refid="selectSql"></include>
+		</where> 
+
+		 limit #{page.start},#{page.rows}
+	</select>
+	<sql id="selectSql">
+			<if test="user.name != null and user.name.trim()!=''"> u.name like concat('%',#{user.name},'%')</if>
+			<if test="user.sex != null and user.sex.trim()!=''"> and u.sex like concat('%',#{user.sex},'%')</if>
+			<if test="user.phone != null and user.phone.trim()!=''"> and u.phone like concat('%',#{user.phone},'%')</if>
+			<if test="user.email != null and user.email.trim()!=''"> and u.email like concat('%',#{user.email},'%')</if>
+	</sql>
+	<select id="get" resultMap="user">
+			select u.id,u.username,u.name,u.password,u.sex,u.phone,u.email from user u where u.id=#{id}
+	</select>
+	<delete id="del">
+		delete from user where id=${_parameter}
+	</delete>
+	<update id="update" parameterType="user">
+		update user
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name!=null">name=#{name},</if>
+			<if test="username!=null and username.trim()">username=#{username},</if>
+			<if test="sex!=null">sex=#{sex},</if>
+			<if test="password!=null">password=#{password},</if>
+			<if test="phone!=null">phone=#{phone},</if>
+			<if test="email!=null">email=#{email},</if>
+		</trim>
+		where id=#{id}
+	</update>
+	
+	<update id="newPass" >
+		update user set password=#{0} where id=#{1}
+	</update>
+	
+	<update id="updatepwd" >
+		update user set password=#{pw} where id=#{id}
+	</update>
+	
+	<insert id="save" parameterType="user" useGeneratedKeys="true" keyProperty="id" >
+		insert into user(name,username,sex,password,phone,email) values(#{name},#{username},#{sex},#{password},#{phone},#{email})
+	</insert>
+	
+	<select id="loginUser" resultMap="user">
+		select * from user u where u.username=#{username}
+	</select>
+	
+	<select id="getuserbyName" resultMap="user">
+		select * from user u where u.username=#{username}
+	</select>
+</mapper>

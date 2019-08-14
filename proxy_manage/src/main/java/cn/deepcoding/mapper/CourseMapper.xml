@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.CourseDao">
+	
+	<resultMap type="cn.deepcoding.model.Course" id="CourseResult">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="input_name" property="inputName"/>
+		<association property="major" column="major_id" select="cn.deepcoding.dao.MajorDao.getById"/>
+		
+	</resultMap>	
+	
+	<!--根据考试课程id获取 -->
+	<select id="getById" resultMap="CourseResult" >
+		
+		select * from course  where id=#{id}
+	
+	</select>
+	
+	
+	<!-- 获取所有考试数据 -->
+	<select id="getAll" resultMap="CourseResult">
+		
+		select * from course
+	
+	</select>
+	
+	
+	
+	<!--通过学生id获取所学课程 -->
+	<select id="getCourses"  parameterType="java.lang.Integer"  resultMap="CourseResult">
+		
+		select * from course where  major_id = (select major_id from student where id =#{id}) order by id;
+	
+	</select>
+	
+	
+	
+	<!--通过一条考试成绩id信息获取他学的哪些科目 -->
+	<select id="getExamCourses"  parameterType="java.lang.Integer"  resultMap="CourseResult">
+		
+		select * from course where  major_id = (select major_id from student where id =(select student_id from exam where id = #{id})) order by major_id;
+	
+	</select>
+		
+	
+	
+	<!-- 通过班级查找该班考试需要多少课程	 -->
+	<select id="getClassCourse"  parameterType="java.lang.Integer" resultMap="CourseResult">
+	
+		select * from course where major_id in(select major_id from student where classroom_id =#{id} group by major_id order by major_id) group by name order by id
+	
+	</select>
+	
+	
+	
+	<!-- 通过姓名模糊查询返回这些人一共有几门课程，课程去重复 -->
+	<select id="getStudentCourses"    parameterType="cn.deepcoding.model.Student"     resultMap="CourseResult" >
+			
+			select * from course where major_id in(select major_id from student where name like '%${name}%' 
+			
+			<if test="classroom!=null">and  classroom_id = #{classroom.id}</if>
+			
+			 group by major_id order by major_id) group by name order by id
+	
+	</select>
+	
+	
+	<!-- 多种条件组合查询 -->
+	<select id="getFilterCourse" resultMap="CourseResult"  >	
+			
+			select * from course where major_id in(
+				select major_id from student where name like "%${name}%" 
+				<if test="classroomId != null " >and classroom_id = #{classroomId}</if>  and id 
+				in (select student_id  from exam where 1 = 1 
+				<if test=" examName != '' and examName != null">and  name = #{examName}</if>
+				<if test=" beginTime != '' and beginTime != null">and  date &gt;=  #{beginTime}</if>
+				<if test=" endTime  != '' and endTime  != null ">and  date &lt;= #{endTime}</if>  group by student_id) group by major_id) group by name order by id 
+	</select>
+	
+	
+	<select id="getAllCourse"  resultMap="CourseResult">
+		select * from course group by name
+	</select>
+	
+	<select id="haveCourse"  resultType="java.lang.Integer">
+			select c.id from course c,student s where s.id = #{studentId} and s.major_id = c.major_id and c.input_name = #{inputName} 
+	</select>
+	
+
+	
+	<insert id="save" >
+		insert into course(name,major_id,input_name) values(#{name},#{major.id},#{inputName})
+	</insert>
+	<update id="update">
+		update course set name = #{name},major_id = #{major.id},input_name = #{inputName} where id = #{id}
+	</update>
+	<delete id="delete">
+		delete from course where id = #{id}
+	</delete>
+	
+	<select id="getMajorId"  resultMap="CourseResult">
+		select * from course 
+		<where>
+			<if test="majorId != null and majorId != '' ">
+				major_id=#{majorId}
+			</if> 
+		</where>
+		 
+	</select>
+</mapper>

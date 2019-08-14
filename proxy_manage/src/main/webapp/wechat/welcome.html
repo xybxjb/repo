@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>欢迎</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/login.css" />
+<script>
+	var html = document.getElementsByTagName('html')[0];
+	html.style.fontSize = html.clientWidth / 3.75 + "px";
+</script>
+</head>
+<body>
+	<div class="w100">
+		<div class="w85 margin_auto">
+			<p class="mt3 f18 tc font_fam">欢迎登录</p>
+			<p class="tc f18 font_fam mt1">深度创远自助查询系统</p>
+			<div class="tc mt3">
+				<img class="w90" src="img/icon03.png" />
+			</div>
+			<div class="logo_information f16 mt3">
+				<p></p>
+				<p></p>
+				<p></p>
+			</div>
+			<p class="tc f16 mt3">
+				<span class="colorRed" id="num">10</span>秒后自动跳转...
+			</p>
+		</div>
+	</div>
+</body>
+</html>
+<script src="js/jquery-3.3.1.min.js" type="text/javascript"
+	charset="utf-8"></script>
+<script type="text/javascript">
+	
+	$(function() {
+		$.ajax({
+					url : "/proxy_manage/proxyTeacherWechat/getProxyTeacherTel", //请求的url地址
+					type : "post",
+					success : function(date) {
+						$.ajax({
+									type : "POST",
+									url : "/proxy_manage/proxyTeacherWechat/getProxyTeacherByTel",
+									data : {
+										tel : date
+									},
+									success : function(response) {
+										$(".logo_information p").eq(0).html(
+												"姓　　名：" + response["name"]);
+										$(".logo_information p")
+												.eq(1)
+												.html(
+														"身份证号："
+																+ response['idcard']
+																		.replace(
+																				/(\d{4})\d*([0-9a-zA-Z]{4})/,
+																				"$1******$2"));
+										$(".logo_information p").eq(2).html(
+												"地　　址：" + response["address"]);
+									},
+									error : function(error) {
+										console.log(error);
+									}
+								})
+					}
+				});
+
+		/*3秒后自动跳转*/
+		var second = $('#num').text();
+		var time = setInterval(showTime, 1000);
+		function showTime() {
+			second--;
+			$('#num').text(second);
+			if (second == 0) {
+				window.location.replace("information.html");
+				//window.location = "information.html";
+				clearInterval(time);
+			}
+		}
+		
+		
+	})
+</script>

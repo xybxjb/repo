@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.AppUsersDao">
+	<resultMap type="AppUsers" id="appUsersResultMap">
+		<id property="appId" column="app_id"/>
+		<result property="appName" column="app_name"/>
+		<result property="appPassword" column="app_password"/>
+		<result property="appTel" column="app_tel"/>
+		<result property="proxyTeacherId" column="proxy_teacher_id"/>
+	</resultMap>
+	
+	<!-- 根据账号 查询信息 -->
+	<select id="getByName" parameterType="String" resultMap="appUsersResultMap">
+		select * from app_user where app_name=#{appName}
+	</select>
+	<!-- 根据手机号 查询信息 -->
+	<select id="getByTel" parameterType="String" resultMap="appUsersResultMap">
+		select * from app_user where app_tel=#{appTel}
+	</select>
+	<!-- 修改密码 -->
+	<update id="updatePassword" parameterType="cn.deepcoding.model.AppUsers">
+		update app_user set app_password=#{appPassword} where app_tel=#{appTel}
+	</update>
+	<!-- 添加信息 -->
+	<insert id="addAppUser" parameterType="cn.deepcoding.model.AppUsers">
+		insert into app_user(app_name,app_password,app_tel,proxy_teacher_id)
+		values(#{appName},#{appPassword},#{appTel},#{proxyTeacherId})
+	</insert>
+	<!--根据招生老师的ID查询用户信息  -->
+	<select id="getAppuserById" parameterType="Integer" resultMap="appUsersResultMap">
+		select * from app_user where proxy_teacher_id=#{proxyTeacherid}
+	</select>
+	
+</mapper>

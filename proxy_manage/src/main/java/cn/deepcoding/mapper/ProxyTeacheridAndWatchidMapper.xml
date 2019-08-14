@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyTeacheridAndWatchidDao">
+
+	<resultMap type="cn.deepcoding.model.ProxyTeacherIdAndWatchId"
+		id="ResultMap">
+		<id column="id" property="id" />
+		<association property="proxyteacheer" column="proxy_teacher_id"
+			select="cn.deepcoding.dao.ProxyTeacherDao.get"></association>
+	</resultMap>
+
+	<!-- 通过微信id获取招生老师的ID -->
+	<select id="getByWatchid" parameterType="Integer" resultMap="ResultMap">
+		SELECT *FROM proxyteacherid_watch_id WHERE
+		Proxy_teacher_watch_id=#{id};
+	</select>
+	<!-- 通过招生老师Id删除中间表信息 -->
+	<delete id="DeleteproxyteacherIdandwatchIdByproteacherId"
+		parameterType="Integer">
+		DELETE FROM proxyteacherid_watch_id WHERE
+		proxy_teacher_id=#{proteacherid};
+	</delete>
+	<!--将招生老师微信信息与招生老师信息关联 -->
+	<insert id="proxyteacherIdandwatchIdAdd" parameterType="cn.deepcoding.model.ProxyTeacherIdAndWatchId">
+		INSERT INTO proxyteacherid_watch_id(proxy_teacher_id,Proxy_teacher_watch_id) VALUES(#{proxyteacheer.id},#{proteacherwatch.id})
+
+	</insert>
+
+</mapper>

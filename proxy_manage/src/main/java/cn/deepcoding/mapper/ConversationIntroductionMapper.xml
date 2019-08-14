@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ConversationIntroductionDao">
+	<resultMap id="ConversationIntroductionResult" type="cn.deepcoding.model.ConversationIntroduction">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="conver_date" property="converDate"/>
+		<result column="point_time" property="pointTime"/>
+		<result column="problem_reason" property="problemReason"/>
+		<result column="remarks" property="remarks"/>
+		<result column="classroom" property="classroom"/>
+	</resultMap>
+	
+	<select id="getByNameAndTime" resultMap="ConversationIntroductionResult">
+		select * from conversation_introduction
+		<where>
+			<if test="conversationIntroduction.name != null and conversationIntroduction.name.trim() != ''">
+				and name like "%${conversationIntroduction.name}%"
+			</if>
+			<if test="conversationIntroduction.begindate != null and conversationIntroduction.begindate.trim() != ''">
+				and conver_date <![CDATA[>]]>= #{conversationIntroduction.begindate}
+			</if>
+			<if test="conversationIntroduction.enddate != null and conversationIntroduction.enddate.trim() != ''">
+				and conver_date <![CDATA[<]]>= #{conversationIntroduction.enddate}
+			</if>
+		</where>
+		order by conver_date desc
+	</select>
+	
+	<select id="getAllCount" parameterType="cn.deepcoding.model.ConversationIntroduction" resultType="Integer">
+		select count(*) from conversation_introduction
+	</select>
+	
+	
+	
+	
+</mapper>

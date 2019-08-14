@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ReferrerDao">
+	<insert id="addReferrer">
+		insert into referrer_info(name,phone,wechat,organization,referrer_name,referrer_tel)
+		values(#{referrer.name},#{referrer.phone},#{referrer.wechat},#{referrer.organization},#{referrer.referrer_name},#{referrer.referrer_tel})
+	</insert>
+	
+	<select id="getAll" resultType="Referrer">
+		select * from referrer_info
+		<where>
+			<if test="referrer.name!=null and referrer.name.trim()!=''">
+				and name like "%"#{referrer.name}"%"
+			</if>
+		</where>
+		order by id desc
+		limit #{start},#{rows}
+	</select>
+</mapper>

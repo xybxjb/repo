@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyTeacherAuditingDao">
+	<resultMap type="cn.deepcoding.model.ProxyTeacherExpense" id="proxyTeacherAuditingResult">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="idcard" property="idCard"/>
+		<result column="sex" property="sex"/>
+		<result column="tel" property="tel"/>
+		<result column="address" property="address"/>
+		<result property="purpose" column="purpose"/>
+		<result property="datetime" column="datetime"/>
+		<result property="reimAmount" column="reimbursement_amount" />
+		<result property="auditState" column="audit_state"/>
+		<result property="actualAmount" column="actual_amount"/>
+		<result property="reimbursementMileage" column="reimbursement_mileage"/>
+		<collection property="visitFees" column="id" select="cn.deepcoding.dao.ProxyTeacherAuditingDao.findVisitFeeByVisitId"/>
+	</resultMap>
+	<resultMap type="ProxyTeacherExpense" id="proxyTeacherSubmit" extends="proxyTeacherAuditingResult">
+		<collection property="teacherAuditing" column="id" select="cn.deepcoding.dao.ProxyTeacherAuditingDao.findTeacherAuditingById"/>
+	</resultMap>
+	<select id="ListAll" resultMap="proxyTeacherAuditingResult">
+		<!-- select * from proxy_teacher limit #{page.start} ,#{page.rows} -->
+		 select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state in(0,1)
+		 <include refid="selectSql"></include>
+		limit #{page.start},#{page.rows} 
+	</select>
+	<sql id="selectSql"> 
+		<if test="name!=null and name.trim()!=''"> and pt.name like '%${name}%'</if>
+		<if test="tel!=null and tel.trim()!=''"> and pt.tel like '%${tel}%'</if>
+		<if test="idCard != null and idCard.trim() !=''"> and pt.idcard like '%${idCard}%'</if>
+		<if test="starttime !=null and endtime != null"> and ph.datetime between #{starttime} and #{endtime}</if>		
+	</sql>
+	<select id="getTotal" resultType="integer">
+ 		select count(1) from (select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph  
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state in(0,1)
+		 <include refid="selectSql"></include>
+		 )aa 
+ 		
+ 		<!-- select count(1) from proxy_teacher -->
+ 	</select>
+	<select id="getTransportationById" resultType="Transportation">
+		select * from transportation where id=#{id}
+	</select>
+	
+	
+	<select id="getById" resultMap="proxyTeacherSubmit">
+		 select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state in(0,1)
+		 and ph.id=#{id}
+	</select>
+	<select id="getByIdWait" resultMap="proxyTeacherSubmit">
+		select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =2
+		 and ph.id=#{id}
+	</select>
+	
+	<update id="saveOne">
+		update visit_records set audit_state=#{auditState},reimbursement_time=#{datetime} where id=#{id}
+	</update>
+	
+	<insert id="saveTwo">
+		insert into teacher_auditing(
+			<trim suffixOverrides=","> 
+				<if test="id!=null">visit_records_id,</if>
+				<if test="auditState!=null and auditState!=''">audit_status,</if>
+				<if test="auditor!=null and auditor!=''">auditor,</if>
+				<if test="dateTime!=null">audit_time,</if>
+			</trim>
+		) values(
+			<trim suffixOverrides=","> 
+				<if test="id!=null">#{id},</if>
+				<if test="auditState!=null and auditState!=''">#{auditState},</if>
+				<if test="auditor!=null and auditor!=''">#{auditor},</if>
+				<if test="dateTime!=null">#{dateTime},</if>
+			</trim>
+		)
+		
+	</insert>
+	
+	<select id="waitToSubmit" resultMap="proxyTeacherAuditingResult"> 
+		 select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =2
+		 <include refid="selectSql"></include>
+		 limit #{page.start},#{page.rows} 
+	</select>
+	<select id="getTotalWaitToSubmit" resultType="integer">
+		select count(1) from (select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =2
+		 <include refid="selectSql"></include>)aa
+	</select>
+	
+	<update id="update">
+		 update teacher_auditing set auditor=#{auditor},audit_time=#{auditTime},audit_status=#{auditState} where id=#{id}
+	</update>
+	
+	<select id="haveTotal" resultType="integer">
+		select count(1) from (select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =3
+		 <include refid="selectSql"></include>
+		 )aa
+	</select>
+	<select id="haveToSubmit" resultMap="proxyTeacherSubmit">
+		select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =3
+		 <include refid="selectSql"></include>
+	</select>
+	<select id="findTeacherId" resultType="ProxyTeacher">
+		select * from proxy_teacher where id=#{id}
+	</select>
+	<select id="findproxyTeacher" resultType="integer">
+		select proxy_teacher_id from visit_records where id=#{id}
+	</select>
+	<select id="findVisitFeeByVisitId" resultMap="visitFeeResult">
+		select id,ticket_amount,actual_amount,reimbursement_mileage,transportation_id,reimbursement_voucher from visit_fee where visit_records_id=#{id}
+	</select>
+	<resultMap type="cn.deepcoding.model.VisitFee" id="visitFeeResult">
+		<id property="id" column="id"/>
+		<result property="ticketAmount" column="ticket_amount"/>
+		<result property="actualAmount" column="actual_amount"/>
+		<result property="reimbMileage" column="reimbursement_mileage"/>
+		<result property="reimbVoucher" column="reimbursement_voucher"/>
+		<association property="trans" column="transportation_id" select="cn.deepcoding.dao.ProxyTeacherAuditingDao.getTransportationById"/>
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.StudentTeacherAuditing" id="teacherAuditingResult">
+		<id property="id" column="id"/>
+		<result property="auditor" column="auditor"/>
+		<result property="auditTime" column="audit_time"/>
+		<result property="auditStatus" column="audit_status"/>
+	</resultMap>
+	<select id="findTeacherAuditingById" resultMap="teacherAuditingResult">
+		select * from teacher_auditing where visit_records_id=#{id}
+	</select>
+	<select id="haveToSubmitById" resultMap="proxyTeacherSubmit">
+		select ph.id, pt.name,pt.address,pt.sex,pt.idcard,pt.tel,ph.purpose,ph.datetime,
+		 ph.reimbursement_amount,ph.audit_state  
+		 from proxy_teacher pt JOIN visit_records  ph     
+		 where pt.id=ph.proxy_teacher_id and ph.audit_state =3 and ph.id=#{id}
+	</select>
+</mapper>

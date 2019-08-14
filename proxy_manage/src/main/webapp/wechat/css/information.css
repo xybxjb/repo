@@ -1,0 +1,22 @@
+.record{
+	color: #75bfc8;
+}
+.stu_infor{
+	width: 100%;
+}
+.stu_infor thead{
+	line-height: .4rem;
+	background: #EDEBEB;
+}
+.stu_infor th,td{
+	text-align: center;
+}
+.stu_infor tbody tr{
+	line-height: .5rem;
+	border-bottom: .01rem solid #EDEBEB;
+}
+.stu_infor img{
+	width: 40%;
+}
+
+

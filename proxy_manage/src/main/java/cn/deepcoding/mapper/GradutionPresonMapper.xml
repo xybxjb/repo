@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.GradutionPresonDao">
+
+	<select id="getGradutionPresonList" resultType="cn.deepcoding.model.FindJodPreson">
+		SELECT
+			student.address
+		FROM
+			graduated
+		LEFT JOIN student ON student.id = graduated.student_id  ORDER BY graduated.gradution_time desc
+	</select>
+	
+	<select id="getFindJodPresonByAddress" resultType="cn.deepcoding.model.FindJodPreson">
+		SELECT
+			*
+		FROM
+			(
+			SELECT
+				student.id,
+				student. name,
+				student.address,
+				student.picture,
+				graduated.gradution_time
+			FROM
+				graduated
+			LEFT JOIN student ON student.id = graduated.student_id
+			) a
+		WHERE
+			a.address LIKE concat("%",#{addressStr},"%")
+	</select>
+</mapper>
+

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans     
+       http://www.springframework.org/schema/beans/spring-beans.xsd    
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- 基于spring自动代理方式为service创建代理对象,实现权限控制 -->
+	<!-- <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"> 
+		强制使用cglibdaili <property name="proxyTargetClass" value="true"></property> 
+		</bean> <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" 
+		/> -->
+	<!-- /** 除了已经设置的其他路径的认证 -->
+	<!-- shiro工厂bean配置 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- shiro的核心安全接口 -->
+		<property name="securityManager" ref="securityManager"></property>
+		<!-- 要求登录时的连接 -->
+		<property name="loginUrl" value="/login"></property>
+		<!-- 登录成功后要跳转的连接(此处已经在登录中处理了) -->
+		<!-- <property name="successUrl" value="/index.jsp"></property> -->
+		<!-- 未认证时要跳转的连接 -->
+		<property name="unauthorizedUrl" value="/shiro.jsp"></property>
+		<!-- shiro连接约束配置 -->
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- 请求该地址 shiro 会清除session -->
+				/logout.action = logout
+				<!-- 对静态资源设置允许匿名访问 -->
+				/static/** = anon
+				/login = anon
+				/users/cat = anon
+				/users/faceLogin = anon
+				<!-- 可匿名访问路径，例如：验证码、登录连接、退出连接等 -->
+				/checks = anon
+				/app/** = anon
+				/ceshi/**=anon
+				/appNew/** = anon
+				<!--swagger接口文档-->
+				/doc.html = anon
+				/swagger*/**=anon
+				/v2/**=anon
+				/webjars/**=anon		
+				<!-- 剩余其他路径，必须认证通过才可以访问 -->
+				/** = authc
+			</value>
+		</property>
+	</bean>
+
+	<!-- 配置shiro安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		   <property name="realms" ref="customRealm"></property> 
+	</bean>
+
+	<!-- 自定义Realm -->
+	<bean id="customRealm" class="cn.deepcoding.shiro.MyRealm" init-method="setCredentialMatcher">
+	
+	</bean>
+
+	<!-- 配置 Bean 后置处理器: 会自动的调用和 Spring 整合后各个组件的生命周期方法. -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- shiro开启事务注解 -->
+	<!-- <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor"> 
+		<property name="securityManager" ref="securityManager" /> </bean> -->
+	<!-- 配置凭证算法匹配器 -->
+	<!-- <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher"> 
+		Md5算法 <property name="hashAlgorithmName" value="Md5"></property> </bean> -->
+
+</beans>

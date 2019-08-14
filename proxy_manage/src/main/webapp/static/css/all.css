@@ -1,0 +1,79 @@
+@charset "UTF-8";
+*{
+	
+	font-family: Hiragino Sans Gb;
+}
+.searchdiv{
+	 height:10px; 
+	 width:220px; 
+	margin-left: 10px;
+	/* margin-top:5px; 
+	margin-button:5px; */
+	float:left;
+}
+/* .clearfloat{
+	height:30px;
+	width:220px;
+	margin-left: 10px;
+	margin-top:5px;
+	margin-button:5px;
+	clear: both;
+	float:left;
+} */
+.ui_font{
+	width:70px;
+	text-align: right;
+}
+/* .tt_font{
+	width:90px;
+	text-align: right;
+} */
+aa_font{
+	width:70px;
+}
+ .headercss{
+		
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+}
+.inputstyle{
+	height:21px;
+	width:40px;
+	float:right;
+}
+.button_size{
+	height:30px;
+	width:200px;
+	margin-left: 10px;
+	margin-top:5px;
+	margin-button:5px;
+	float:right;
+	padding-left: 38px;
+}
+.editwindow{
+	height:30px;
+	width:220px;
+	margin-left: 10px;
+	margin-top:5px;
+	margin-button:5px;
+	text-align: center;
+}
+/* .audit_div{
+	height:30px;
+	width:230px;
+	margin-left: 10px;
+	margin-top:5px;
+	margin-button:5px;
+	float: left;
+} */
+.sssdiv{
+	clear: both;
+	height:30px;
+	width:230px;
+	margin-left: 10px;
+	margin-top:5px;
+	margin-button:5px;
+	float: left;
+}

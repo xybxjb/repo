@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyCommissionDao">
+		<!-- 查询当月缴纳学费总额数 -->
+		<select id="totalAmount" resultType="double">
+			select SUM(f.amount) total from fee f where f.type='学费' and month(f.payment_time)=month('${date}') and year(f.payment_time)=year('${date}')
+
+		</select>
+		<!--查询未缴纳学费总金额  -->
+		<select id="commissionNo" resultType="integer"> 
+			select sum(unpai_tuition) from student 
+		</select>
+		
+		
+		<!-- 查询下级招生老师 -->
+		<select id="findById" resultType="ProxyTeacher">
+			select name from proxy_teacher where id=#{id}
+		</select>
+		<resultMap type="cn.deepcoding.model.StudentBean" id="stu1">
+			<id property="student_id" column="student_id"/>
+			<collection property="amount" column="id" select=""></collection>
+		</resultMap>
+		<resultMap type="cn.deepcoding.model.ProxyTeacherHistory" id="Historyresult">
+			<id property="id" column="id"/>
+			<result property="proxyteacherId" column="proxyteacher_id"/>   
+			<result property="proxyteacherName" column="proxyteacher_name"/>
+			<result property="studentId" column="student_id"/>
+			<result property="studentName" column="student_name"/>
+			<result property="studentTuitionAmount" column="student_tuition_amount"/>
+			<result property="commissionPoint" column="commission_point"/>
+			<result property="commissionAmount" column="commission_amount"/>
+			<result property="commissionDate" column="commission_date"/>
+			
+		</resultMap>
+		<!-- 查询每个缴费的学生的信息 -->
+		<select id="everyStudent" resultMap="stu1">
+			select f.student_id, sum(f.amount) amount from fee f where f.type='学费'and MONTH(f.payment_time)=month(#{date}) and year(f.payment_time)=year(#{date}) group by f.student_id
+		</select>
+		<!-- 寻找上级老师id -->
+		<select id="findParentTeacherId" resultType="integer"> 
+			select parent_proxy_teacher_id from proxy_teacher where id =#{id}
+		</select>
+		<!-- 查找学生的直接招生老师ID -->
+		<select id="stuAmount" resultType="integer"> 
+			select proxy_teacher_id from student where id=#{id} AND  commission=1;
+		</select>
+		<!-- 查找招生老师点位 -->
+		<select id="teacherPoint" resultType="string"> 
+			select point from proxy_teacher where id=#{id}
+		</select>
+		
+		<resultMap type="cn.deepcoding.model.ProxyTeacherAmount" id="proxyteacheramount">
+			<id property="id" column="id"/>
+			<result property="name" column="name"/>
+			<result property="address" column="address"/>
+			<result property="tel" column="tel"/>
+			<collection property="ranks" column="rank_id" select="cn.deepcoding.dao.ProxyCommissionDao.selectRankId"></collection>
+		</resultMap>
+		<select id="selectRankId" resultType="Rank">
+			select * from rank where id=#{id} 
+		</select>
+		
+		<!-- 查询没有上级老师的人 -->
+		<select id="findNoParent" resultMap="proxyteacheramount">
+			select * from proxy_teacher where parent_proxy_teacher_id is null limit #{page.start},#{page.rows}
+		</select>
+
+
+		<select id="getTotal" resultType="integer">
+
+			select count(1) from proxy_teacher where parent_proxy_teacher_id is null
+		</select>
+		
+		<!-- 添加到历史表里的数据 -->
+		<insert id="saveHistory">
+			insert into proxyteacher_commission_history<!-- (proxyteacher_id,proxyteacher_name,student_id,
+			student_name,student_tuition_amount,commission_point,commission_amount,commission_date)values(
+			#{p.proxyteacherId},#{p.proxyteacherName},#{p.studentId},#{p.studentName},#{p.studentTuitionAmount},
+			#{p.commissionPoint},#{p.commissionAmount},#{p.commissionDate}) -->
+			(
+			 <trim suffixOverrides=",">
+				<if test="proxyteacherId!=null">proxyteacher_id,</if>
+				<if test="proxyteacherName!=null and proxyteacherName!=''">proxyteacher_name,</if>
+				<if test="studentId!=null">student_id,</if>
+				<if test="studentName!=null and studentName!=''">student_name,</if>
+				<if test="studentTuitionAmount!=null">student_tuition_amount,</if>
+				<if test="commissionPoint!=null">commission_point,</if>
+				<if test="commissionAmount!=null">commission_amount,</if>
+				<if test="commissionDate!=null">commission_date,</if>
+			</trim>
+			) values(
+			<trim suffixOverrides=",">
+				<if test="proxyteacherId!=null">#{proxyteacherId},</if>
+				<if test="proxyteacherName!=null and proxyteacherName!=''">#{proxyteacherName},</if>
+				<if test="studentId!=null">#{studentId},</if>
+				<if test="studentName!=null and studentName!=''">#{studentName},</if>
+				<if test="studentTuitionAmount!=null">#{studentTuitionAmount},</if>
+				<if test="commissionPoint!=null">#{commissionPoint},</if>
+				<if test="commissionAmount!=null">#{commissionAmount},</if>
+				<if test="commissionDate!=null">#{commissionDate},</if>
+			</trim>
+			) 
+		</insert>
+		
+		<!-- 每个招生老师提成  ！从历史表取数据 -->
+		<select id="selectEveryProxyTeacherAmount" resultMap="Historyresult">
+			select proxyteacher_id ,sum(commission_amount) commission_amount from proxyteacher_commission_history
+			where year(commission_date)=year(#{date}) and month(commission_date)=month(#{date})
+			group by proxyteacher_id
+		</select>
+		<resultMap type="ProxyTeaMonth" id="monthHistory">
+			<id column="id" property="id"/>
+			<result column="proxyteacher_id" property="proxyTeacherId"/>
+			<result column="proxyteacher_name" property="proxyTeacherName"/>			
+			<result column="commission_point" property="commissionPoint"/>
+			<result column="commission_amount" property="commissionAmount"/>
+			<result column="commission_date" property="commissionDate"/>
+			<result column="remarks" property="remarks"/>
+			<result column="state" property="wageState"/>
+		</resultMap>
+		<select id="history" resultMap="monthHistory">
+			select * from proxyteacher_month 
+			<include refid="selectSql"></include>
+			limit #{page.start},#{page.rows}
+		</select>
+		<sql id="selectSql">
+			<where>
+				<if test="name!=null and name!=''"> and proxyteacher_name like '%${name}%'</if>				
+				<!-- <if test="cid != null and cid !=''"> and pt.idcard like '%${idCard}%'</if> -->
+				<if test="starttime !=null and endtime != null"> and commission_date between #{starttime} and #{endtime}</if>	
+			</where> 	
+		</sql>
+		<select id="historyTotal" resultType="integer">
+			select count(1) from proxyteacher_month
+			<include refid="selectSql"></include>
+		</select>
+		
+</mapper>

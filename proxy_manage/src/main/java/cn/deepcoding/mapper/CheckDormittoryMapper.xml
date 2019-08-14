@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.CheckDormitoryDao">
+	<resultMap type="cn.deepcoding.model.CheckDormitory" id="FindCheckDormitory">
+		<id property="id" column="id" />
+		<result property="checkdata" column="check_data" />
+		<result property="actual" column="actual" />
+		<result property="absence" column="absence" />
+		<result property="situation" column="situation" />
+		<result property="note" column="note" />
+		<collection property="dormitory" column="dormitory_id"
+			select="cn.deepcoding.dao.DormitoryDao.GetById"></collection>
+
+
+
+	</resultMap>
+
+	<select id="FindCheckDormitoryAll" resultMap="FindCheckDormitory">
+
+		SELECT * FROM check_dormitory where 1=1
+		<if test="checkdormitory.did != null and checkdormitory.did!=''">
+			AND `dormitory_id` =#{checkdormitory.did}
+		</if>
+		<if
+			test="checkdormitory.checkdata != null and checkdormitory.checkdata!=''">
+			AND check_data =#{checkdormitory.checkdata}
+		</if>
+		limit #{page.start},#{page.rows}
+		;
+	</select>
+
+
+
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.CheckDormitory"
+		resultType="Integer">
+		SELECT count(1) FROM check_dormitory ;
+	</select>
+
+
+
+
+	<insert id="CheckDormitoryAdd">
+
+		INSERT INTO check_dormitory(dormitory_id,check_data,actual,absence,situation,note)
+		VALUES(#{did},#{checkdata},#{actual},#{absence},#{situation},#{note});
+	</insert>
+
+
+	<delete id="CheckDormitoryDelete">
+
+		DELETE FROM check_dormitory WHERE id=#{id};
+
+	</delete>
+
+
+
+	<select id="CheckDormitoryGetById" resultMap="FindCheckDormitory">
+
+		SELECT * FROM
+		check_dormitory where id=#{id};
+	</select>
+
+
+	<update id="CheckDormitoryUpdate">
+
+		update check_dormitory
+		<trim prefix="set" suffixOverrides=",">
+			<if test="checkdata != null ">check_data=#{checkdata},</if>
+			<if test="actual != null ">actual=#{actual},</if>
+			<if test="absence != null ">absence=#{absence},</if>
+			<if test="situation != null ">situation=#{situation},</if>
+			<if test="note != null ">note=#{note},</if>
+		</trim>
+		where id = #{id} and `dormitory _id`=#{did};
+
+
+
+	</update>
+
+</mapper>
+	

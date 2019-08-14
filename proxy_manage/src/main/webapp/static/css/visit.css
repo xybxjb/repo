@@ -1,0 +1,74 @@
+@CHARSET "UTF-8";
+.headercss {
+	    margin-top: 20px;
+	    margin-left: 10px;
+	    margin-right: 10px;
+	    margin-bottom: 20px;
+	}
+	.form_fieldset{
+   		 border: 1px solid #95B8E7;
+   		 height: 101px;
+   		 padding: 0px;
+	}
+	.shijian{
+		float: right;
+	    display: block;
+	    margin-top: 25px;
+	    margin-right:59px;
+	    width: 398px;
+	    height:78px;
+	}
+	.name{
+		float: left;
+		width: 309px;
+	    height: 25px;
+	    margin-top: 25px;
+	    margin-left: 35px;
+	}
+	.chufa{
+		width:280px;
+		margin-top:13px;
+		margin-left:35px;
+		float: left;
+	}
+	.chaxun{
+    	margin-top: -40px;
+    	margin-right:120px;
+		float: right;
+		
+	}
+	.add{
+	width: 560px;
+    height: 125px;
+	}
+	
+	
+	.add_1{
+		width:253px;
+		float:left;
+		height:125px;
+	}
+	.add_style_1{
+		width: 226px;
+		height: 33px;
+		margin-left:38px;
+	}
+	.add_2{
+		width:278px;
+		float:right;
+		height:125px;
+	}
+	.add_3{
+		width:560px;
+		height:70px;
+	}
+	.add{
+		/* border: 1px solid #95B8E7; */
+	
+	
+	}
+	.filebox{  
+  			display:block;  
+  			margin:0 auto;  
+
+ 		}

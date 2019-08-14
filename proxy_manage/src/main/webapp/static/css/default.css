@@ -1,0 +1,69 @@
+*{font-size:12px; font-family:Tahoma,Verdana,΢���ź�,������}
+/* body{background:#D2E0F2; } */
+a{ text-decoration:none;}
+a:hover{ color:Red; text-decoration:underline;}
+.textbox03 {border: #878787 1px solid;padding: 4px 3px;font:Verdana, Geneva, sans-serif,����;line-height: 14px; background-color: #fff;  height: auto; font-size: 14px;  font-weight: bold; width: 190px; }
+
+.txt01{font:Verdana, Geneva, sans-serif,����;padding:3px 2px 2px 2px; border-width:1px; border-color:#ddd;  color:#000;}
+.txt {border: #878787 1px solid;padding: 4px 3px;font:Verdana, Geneva, sans-serif,����;line-height: 14px; background-color: #fff;  height: auto; font-size: 14px;}
+.footer{text-align:center;color:#15428B; margin:0px; padding:0px;line-height:23px; font-weight:bold;}
+
+.head a{color:White;text-decoration:underline;}
+.north{overflow: hidden; height: 50px; background: url(../images/layout-browser-hd-bg.gif) #7f99be repeat-x center 50%; line-height: 40px; color: #fff; font-family: Verdana, ΢���ź�, ����}
+.south{height: 35px; background: #D2E0F2;}
+.west{width: 180px !important;}
+.mainPanle{background: #eee; overflow-y: hidden}
+
+.easyui-accordion ul{list-style-type:none;margin:0px; padding:10px;}
+.easyui-accordion ul li{ padding:0px;}
+.easyui-accordion ul li a{line-height:24px;}
+.easyui-accordion ul li div{margin:2px 0px;padding-left:10px;padding-top:2px;}
+.easyui-accordion ul li div.hover{border:1px dashed #99BBE8; background:#E0ECFF;cursor:pointer;}
+.easyui-accordion ul li div.hover a{color:#416AA3;}
+.easyui-accordion ul li div.selected{border:1px solid #99BBE8; background:#E0ECFF;cursor:default;}
+.easyui-accordion ul li div.selected a{color:#416AA3; font-weight:bold;}
+
+
+
+.icon{padding:2px 9px; background:url(../images/tabicons.png) no-repeat; }
+.icon-sys{ background:url(../images/directory.png) no-repeat;}
+.icon-add{background-position: -19px 0px;}
+.icon-nav{background-position: -100px -18px;}
+.icon-users{background-position: -100px -480px;}
+.icon-role{background-position: -360px -200px;}
+.icon-set{background-position: -380px -200px;}
+.icon-log{background-position: -380px -80px;}
+.content{
+	width:94%;
+	height:100%;
+	padding:15px 15px 0px 15px !important;
+}
+
+form{
+	height:auto;
+}
+.form_fieldset{
+	padding:20px;
+	border: 1px solid #95B8E7;
+}
+.search_form{
+	height:100px;
+	margin-bottom: 20px;
+}
+.form_filed{
+	float:left;
+	display: block;
+	margin-left:30px;
+}
+.form_search{
+	/* width:120px; */
+	float:right;
+	display: block;
+	padding-right:100px;
+}
+.form_filed label{
+	width:150px;
+}
+.form_filed input{
+	width:150px;
+}

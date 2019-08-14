@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>推荐学生信息</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+		<meta name="format-detection" content="telephone=no" />
+		<link rel="stylesheet" type="text/css" href="css/base.css"/>
+		<link rel="stylesheet" type="text/css" href="css/details.css"/>
+		<script>
+			var html = document.getElementsByTagName('html')[0];
+			html.style.fontSize = html.clientWidth / 3.75 + "px";
+		</script>
+	</head>
+	<body>
+		<div class="w100">
+			<!-- <a class="f20 font_fam mt2 pl2 color80 dis_inlin_biock" href="information.html"><img class="w8" src="img/icon05_jt.png"/>　推荐学生信息</a> -->
+			<img class="w100 mt1" src="img/icon04.png"/>
+			<div class="w85 margin_auto f16 mt1">
+				<div class="details_cont">
+					<p class="tc f18 fb">详情</p>
+					<div class="stu_x">
+						
+					</div>
+				</div>
+				<p class="tc fb f18 mb1 mt2">缴费历史</p>
+				<table class="payTheFees w100 mb2" border="1">
+					<thead>
+						<tr>
+							<th>缴费时间</th>
+							<th>金额(元)</th>
+							<th>支付方式</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>	
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	$(function(){
+		function oneValues(){
+			var result;
+			var url=window.location.search; //获取url中"?"符后的字串  
+			if(url.indexOf("?")!=-1){
+				result = url.substr(url.indexOf("=")+1);
+			}
+			return result;
+		}
+		var id = oneValues();
+		$.ajax({
+			type:"POST",
+			url:"/proxy_manage/proxyTeacherWechat/getById",
+			data : {
+				studentId : id
+			},
+			success : function(response){
+				console.log(response);
+				let moBan =
+				    `<p>姓　　名：${response['name']}</p>
+					<p>性　　别：${response['sex']}</p>
+					<p>入学时间：${response['join_time']}</p>
+					<p>身份证号：${response['idcard'].replace(/(\d{4})\d*([0-9a-zA-Z]{4})/,"$1******$2")}</p>
+					<p>电　　话：${response['tel'].replace(/(\d{3})\d*([0-9a-zA-Z]{4})/,"$1****$2")}</p>
+					<p>地　　址：${response['address']}</p>
+					<p>总 &nbsp;学 &nbsp;费：${response['tuition']}</p>
+					<p>已交学费：${response['amountTuition']}</p>`;
+
+					
+				$('.stu_x').append(moBan);
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+		$.ajax({
+			type:"POST",
+			url:"/proxy_manage/proxyTeacherWechat/selectFee",
+			data : {
+				studentId : id,
+				page :1,
+				rows : 7
+			},
+			success : function(response){
+				console.log(response);
+				for(var i= 0;i<response.rows.length;i++){
+					var mB =
+						`<tr>
+							<td>${response.rows[i].paymentTime}</td>
+							<td>${response.rows[i].amount}</td>
+							<td>${response.rows[i].payment['name']}</td>
+						</tr>
+					`;
+					$('.payTheFees tbody').append(mB);
+				}
+				
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+	})
+</script>

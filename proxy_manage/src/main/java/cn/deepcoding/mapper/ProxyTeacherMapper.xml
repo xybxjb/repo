@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyTeacherDao">
+	<resultMap type="cn.deepcoding.model.ProxyTeacher" id="ProxyTeacherResult">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="idcard" property="idcard" />
+		<result column="sex" property="sex" />
+		<result column="age" property="age" />
+		<result column="tel" property="tel" />
+		<result column="wechat" property="wechat" />
+		<result column="qq" property="qq" />
+		<result column="bankcard" property="bankcard" />
+		<result column="address" property="address" />
+		<result column="join_date" property="joinDate" />
+		<result column="introducer_name" property="introducerName" />
+		<result column="introducer_type" property="introducerType" />
+		<!-- <result column="point" property="point" /> -->
+		<result column="remark" property="remark" />
+		<result column="bank_name" property="bankName" />
+		<result column="bank_card_number" property="bankCardNumber" />
+		<result column="opening_bank" property="openingBank" />
+		<result column="state" property="state" />
+		<result column="source" property="source" />
+
+		<association property="ranks" column="rank_id"
+			select="cn.deepcoding.dao.RankDao.getById"></association>
+		<association property="proxyTeacherPoint" column="id"
+			select="cn.deepcoding.dao.ProxyTeacherDao.getPointByNow"></association>	
+		<!--招生老师数据来源  -->
+		<!-- <association property="source" column="source"
+			select="cn.deepcoding.dao.SourceDao.findById"></association> -->
+	</resultMap>
+	<resultMap type="ProxyTeacher" id="LeaderResult" extends="ProxyTeacherResult">
+		<association fetchType="eager" notNullColumn="parent_proxy_teacher_id"
+			property="parentProxyTeacherId" column="parent_proxy_teacher_id"
+			select="cn.deepcoding.dao.ProxyTeacherDao.getParentProxyTeacherId">
+		</association>
+
+	</resultMap>
+	<select id="getParentProxyTeacherId" parameterType="java.lang.Integer"
+		resultMap="ProxyTeacherResult">
+
+		select * from proxy_teacher where id=#{id}
+	</select>
+	<select id="getParentId" parameterType="java.lang.Integer"
+		resultMap="LeaderResult">
+
+		select * from proxy_teacher where state!=1 and id=#{pid}
+	</select>
+	<select id="getAll" resultMap="ProxyTeacherResult">
+		select * from proxy_teacher where
+		state!=1
+	</select>
+	<select id="getRankProxteacher" parameterType="java.lang.Integer"
+		resultMap="LeaderResult">
+		select * from proxy_teacher where state!=1 and id!=#{rankId}
+
+	</select>
+	<select id="find" resultMap="LeaderResult">
+		select * from proxy_teacher where
+		state!=1
+
+	</select>
+	<select id="getXj" resultMap="LeaderResult">
+		select * from proxy_teacher where
+		parent_proxy_teacher_id=#{leaderid}
+	</select>
+	<insert id="add" parameterType="cn.deepcoding.model.ProxyTeacher" useGeneratedKeys="true" keyProperty="id">
+
+		insert into proxy_teacher
+		(
+		<trim suffixOverrides=",">
+
+			<if test="name != null and name!=''">name,</if>
+			<if test="sex != null and sex!=''">sex,</if>
+			<if test="idcard != null and idcard!=''">idcard,</if>
+			<if test="age != null ">age,</if>
+			<if test="tel != null and tel!=''">tel,</if>
+			<if test="wechat != null and wechat!=''">wechat,</if>
+			<if test="qq != null and qq!=''">qq,</if>
+			<if test="bankcard!= null and bankcard!=''">bankcard,</if>
+			<if test="address != null and address!=''">address,</if>
+			<if test="joinDate != null and joinDate!=''">join_date,</if>
+			<if test="introducerName != null and introducerName!=''">introducer_name,</if>
+			<if test="introducerType != null and introducerType!=''">introducer_type,</if>
+			<if test="point != null ">point,</if>
+			<if test="remark != null and remark!=''">remark,</if>
+			<if test="bankName != null and bankName!=''">bank_name,</if>
+			<if test="bankCardNumber != null and bankCardNumber!=''">bank_card_number,</if>
+			<if test="openingBank != null and openingBank!=''">opening_bank,</if>
+			<if test="parentProxyTeacherId!= null ">parent_proxy_teacher_id,</if>
+			<if test="ranks!= null">rank_id,</if>
+			<if test="state!= null">state,</if>
+			<if test="source != null">source,</if>
+		</trim>
+		)
+		values(
+		<trim suffixOverrides=",">
+			<if test="name != null and name!=''">#{name},</if>
+			<if test="sex != null and sex!=''">#{sex},</if>
+			<if test="idcard != null and idcard!=''">#{idcard},</if>
+			<if test="age != null ">#{age},</if>
+			<if test="tel != null and tel!=''">#{tel},</if>
+			<if test="wechat != null and wechat!=''">#{wechat},</if>
+			<if test="qq != null and qq!=''">#{qq},</if>
+			<if test="bankcard!= null and bankcard!=''">#{bankcard},</if>
+			<if test="address != null and address!=''">#{address},</if>
+			<if test="joinDate != null and joinDate!=''">#{joinDate},</if>
+			<if test="introducerName != null and introducerName!=''">#{introducerName},</if>
+			<if test="introducerType != null and introducerType!=''">#{introducerType},</if>
+			<if test="point != null ">#{point},</if>
+			<if test="remark != null and remark!=''">#{remark},</if>
+			<if test="bankName != null and bankName!=''">#{bankName},</if>
+			<if test="bankCardNumber != null and bankCardNumber!=''">#{bankCardNumber},</if>
+			<if test="openingBank != null and openingBank!=''">#{openingBank},</if>
+			<if test="parentProxyTeacherId!= null ">#{parentProxyTeacherId.id},</if>
+			<if test="ranks!= null ">#{ranks.id},</if>
+			<if test="state!= null ">#{state},</if>
+			<if test="source != null ">#{source},</if>
+
+		</trim>
+		)
+
+
+	</insert>
+	<delete id="delete" parameterType="cn.deepcoding.model.ProxyTeacher">
+		delete from proxy_teacher
+		where id=#{id}
+	</delete>
+
+	<select id="get" parameterType="cn.deepcoding.model.ProxyTeacher"
+		resultMap="LeaderResult">
+		select * from proxy_teacher where id=#{id}
+	</select>
+	<update id="update" parameterType="cn.deepcoding.model.ProxyTeacher">
+		update proxy_teacher
+		<trim prefix="set" suffixOverrides=",">
+
+			<if test="name != null and name.trim()!=''">name=#{name},</if>
+			<if test="sex != null and sex.trim()!='' ">sex=#{sex},</if>
+			<if test="idcard != null and idcard.trim()!=''">idcard=#{idcard},</if>
+			<if test="age != null ">age=#{age},</if>
+			<if test="tel != null and tel.trim()!=''">tel=#{tel},</if>
+			<if test="wechat != null and wechat.trim()!=''">wechat=#{wechat},</if>
+			<if test="qq != null and qq.trim()!=''">qq=#{qq},</if>
+			<if test="bankcard!= null and bankcard.trim()!=''">bankcard=#{bankcard},</if>
+			<if test="address != null and address.trim()!=''">address=#{address},</if>
+			<if test="joinDate != null ">join_date=#{joinDate},</if>
+			<if test="introducerName != null and introducerName.trim()!=''">introducer_name=#{introducerName},</if>
+			<if test="introducerType != null and introducerType.trim()!='' ">introducer_type=#{introducerType},</if>
+			<if test="point!= null ">point=#{point},</if>
+			<if test="remark != null and remark.trim()!=''">remark=#{remark},</if>
+			<if test="bankName != null and bankName.trim()!='' ">bank_name=#{bankName},</if>
+			<if test="bankCardNumber != null and bankCardNumber.trim()!='' ">bank_card_number=#{bankCardNumber},</if>
+			<if test="openingBank != null and openingBank.trim()!=''">opening_bank=#{openingBank},</if>
+			<if test="parentProxyTeacherId!= null ">parent_proxy_teacher_id=#{parentProxyTeacherId.id},</if>
+			<if test="ranks!= null ">rank_id=#{ranks.id},</if>
+			<if test="state!= null ">state=#{state},</if>
+		</trim>
+		where id=#{id}
+
+	</update>
+	<update id="deljia" parameterType="ProxyTeacher">
+		update proxy_teacher set
+		state=1
+		where id=#{id}
+	</update>
+	<select id="getPageData" parameterType="cn.deepcoding.model.ProxyTeacher"
+		resultMap="LeaderResult">
+		select * from proxy_teacher where state!=1
+		<include refid="selectSql"></include>
+		order by join_date desc limit #{page.start},#{page.rows}
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(1) from proxy_teacher where 1=1 and state != 1
+		<include refid="selectSql"></include>
+
+	</select>
+
+
+	<sql id="selectSql">
+
+		<if test="proxyTeacher.name !=null and proxyTeacher.name.trim()!='' ">
+			and name like concat('%',#{proxyTeacher.name},'%')
+		</if>
+		<if test="proxyTeacher.sex !=null and proxyTeacher.sex.trim()!='' ">
+			and sex like concat('%',#{proxyTeacher.sex},'%')
+		</if>
+		<if test="proxyTeacher.idcard !=null and proxyTeacher.idcard.trim()!='' ">
+			and idcard like concat('%',#{proxyTeacher.idcard},'%')
+		</if>
+		<if test="proxyTeacher.age !=null ">
+			and age =#{proxyTeacher.age}
+		</if>
+		<if test="proxyTeacher.tel !=null and proxyTeacher.tel.trim()!='' ">
+			and tel like concat('%',#{proxyTeacher.tel},'%')
+		</if>
+		<if test="proxyTeacher.wechat !=null and proxyTeacher.wechat.trim()!='' ">
+			and wechat like concat('%',#{proxyTeacher.wechat},'%')
+		</if>
+		<if test="proxyTeacher.qq !=null ">
+			and qq l=#{proxyTeacher.qq}
+		</if>
+		<if
+			test="proxyTeacher.bankcard !=null and proxyTeacher.bankcard.trim()!='' ">
+			and bankcard like concat('%',#{proxyTeacher.bankcard},'%')
+		</if>
+		<if test="proxyTeacher.address !=null and proxyTeacher.address.trim()!='' ">
+			and address like concat('%',#{proxyTeacher.address},'%')
+		</if>
+		<if test="proxyTeacher.joinDate != null and proxyTeacher.joinDate!=''"> and join_date like
+			concat('%',#{proxyTeacher.joinDate},'%')
+		</if>
+		<if test="proxyTeacher.begindate!=null and proxyTeacher.begindate!=''">and
+			join_date <![CDATA[>=]]>
+			#{proxyTeacher.begindate}
+		</if>
+		<if test="proxyTeacher.enddate!=null and proxyTeacher.enddate!=''">
+			and join_date <![CDATA[<=]]>#{proxyTeacher.enddate}
+		</if>
+		<if
+			test="proxyTeacher.bankcard !=null and proxyTeacher.bankcard.trim()!='' ">
+			and bankcard like concat('%',#{proxyTeacher.bankcard},'%')
+		</if>
+		<if
+			test="proxyTeacher.introducerName !=null and proxyTeacher.introducerName.trim()!='' ">
+			and introducer_name like
+			concat('%',#{proxyTeacher.introducerName},'%')
+		</if>
+		<if
+			test="proxyTeacher.introducerType !=null and proxyTeacher.introducerType.trim()!='' ">
+			and introducer_type like
+			concat('%',#{proxyTeacher.introducerType},'%')
+		</if>
+		<if test="proxyTeacher.point !=null ">
+			and point =#{proxyTeacher.point }
+		</if>
+		<if test="proxyTeacher.remark !=null and proxyTeacher.remark.trim()!='' ">
+			and remark like concat('%',#{proxyTeacher.remark},'%')
+		</if>
+
+		<if
+			test="proxyTeacher.bankName !=null and proxyTeacher.bankName.trim()!='' ">
+			and bank_name like concat('%',#{proxyTeacher.bankName},'%')
+		</if>
+		<if
+			test="proxyTeacher.bankCardNumber !=null and proxyTeacher.bankCardNumber.trim()!='' ">
+			and bank_card_number like
+			concat('%',#{proxyTeacher.bankCardNumber},'%')
+		</if>
+		<if
+			test="proxyTeacher.openingBank !=null and proxyTeacher.openingBank.trim()!='' ">
+			and opening_bank like
+			concat('%',#{proxyTeacher.openingBank},'%')
+		</if>
+		<!-- <if test="proxyTeacher.parentProxyTeacherId!=null and proxyTeacher.parentProxyTeacherId.id!=null">and 
+			parent_proxy_teacher_id =#{proxyTeacher.parentProxyTeacherId.id} </if> <choose> 
+			<when test="proxyTeacher.parentProxyTeacherId!=null and proxyTeacher.parentProxyTeacherId.id!=null"> 
+			and parent_proxy_teacher_id =#{proxyTeacher.parentProxyTeacherId.id} </when> 
+			<otherwise> and leader_id is null </otherwise> </choose> -->
+		<if test="proxyTeacher.ranks !=null and proxyTeacher.ranks.id!=null">
+			and rank_id =#{proxyTeacher.ranks.id}
+		</if>
+		<if test="proxyTeacher.state !=null ">
+			and state=#{proxyTeacher.state}
+		</if>
+		<if test="proxyTeacher.source !=null and proxyTeacher.source.id!=null">
+			and source_id =#{proxyTeacher.source.id}
+		</if>
+	<if test="proxyTeacher.parentProxyTeacherId !=null and proxyTeacher.parentProxyTeacherId.id!=null">
+			and parent_proxy_teacher_id =#{proxyTeacher.parentProxyTeacherId.id}
+		</if>
+	</sql>
+
+
+	<select id="FindByStudentId" parameterType="int" resultMap="ProxyTeacherResult">
+		select p.name from student s,proxy_teacher p where
+		p.id=s.proxy_teacher_id and s.proxy_teacher_id=#{id};
+	</select>
+
+	<select id="getById" resultMap="ProxyTeacherResult">
+		select *from proxy_teacher where
+		id= #{id}
+	</select>
+
+
+	<!-- 陈雪珍 -->
+	<select id="getOneProxyTeacher" resultMap="ProxyTeacherResult">
+
+		select * from
+		proxy_teacher where id= (select proxy_teacher_id from student
+		where id
+		= #{studentId})
+	</select>
+
+	<select id="getProxyTeacherByTel" parameterType="String"
+		resultType="java.util.HashMap">
+		select id,name,tel,address,idcard from proxy_teacher where
+		tel=#{tel}
+	</select>
+	<!-- 根据手机号 查询招生老师信息 -->
+	<select id="getProxyTeacherByTel2" parameterType="String" resultType="cn.deepcoding.model.ProxyTeacher">
+		select id,name,tel  from proxy_teacher where tel=#{appTel}
+	</select>
+	<!-- app -->
+	<!-- 根据招生老师 id 查询上级 id -->
+	<select id="getParentProxyTeacherId2" parameterType="Integer"
+		resultType="Integer">
+		select parent_proxy_teacher_id from proxy_teacher where
+		id=#{id}
+	</select>
+	<select id="getParentProxyTeacher" parameterType="Integer"
+		resultType="cn.deepcoding.model.ProxyTeacher">
+		select id,name,address,sex,tel,point from proxy_teacher
+		where id=#{id}
+	</select>
+	<!-- 根据招生老师 id 查询下级的信息 -->
+	<select id="getSublevelProxyTeacher" parameterType="Integer"
+		resultMap="ProxyTeacherResult">
+		select id,name,address,sex,tel,point from proxy_teacher
+		where parent_proxy_teacher_id=#{id}
+	</select>
+	<resultMap type="cn.deepcoding.model.ProxyTeacherPoint" id="proxyteacherpoint">
+		<id column="id" property="id" />
+		<result column="point" property="point"></result>
+		<result column="startdate" property="startDate"></result>
+		<result column="enddate" property="endDate"></result>
+		<result column="max(enddate)" property="endDateMax" />
+		<result column="proxy_teacher_id" property="proxyTeacherId" />
+		<!-- <association property="proxyteacher" column="proxy_teacher_id" select= 
+			></association> -->
+	</resultMap>
+
+
+	<update id="updatepoint" parameterType="cn.deepcoding.model.ProxyTeacherPoint">
+		update
+		proxy_teacher_point set
+		point=#{point},startdate=#{startDate},enddate=#{endDate} where
+		id=#{id} AND proxy_teacher_id=#{proxyTeacher.id};
+	</update>
+
+	<delete id="deletepoint" parameterType="java.lang.Integer">
+		delete FROM
+		proxy_teacher_point where id=#{id} and proxy_teacher_id
+		=#{proxy_teacher_id};
+	</delete>
+
+	<insert id="addpoint" parameterType="cn.deepcoding.model.ProxyTeacherPoint">
+		insert into
+		proxy_teacher_point
+		(point,startdate,enddate,proxy_teacher_id)
+		values(#{point},#{startDate},#{endDate},#{proxyTeacherId});
+	</insert>
+
+	<select id="selectpointbyid" parameterType="Integer" resultMap="proxyteacherpoint">
+		select * from proxy_teacher_point where id=#{id} And
+		proxy_teacher_id=#{proxyTeacherId};
+	</select>
+       <!--  根据招生老师的id查询点位表中的数据 -->
+	<select id="getpoint" parameterType="java.lang.Integer"
+		resultMap="proxyteacherpoint">
+		select * from proxy_teacher_point where proxy_teacher_id=#{proxy_teacher_id}
+	</select>
+	
+	<!-- 查询招生老师点位最大结束时间 -->
+	<select id="selectponintbynew" parameterType="java.lang.Integer"
+		resultMap="proxyteacherpoint">
+		select *,max(enddate) from proxy_teacher_point where
+		proxy_teacher_id=#{proxyTeacherId};
+	</select>
+	
+	<!--根据学生入学时间与招生老师ID获取招生老师入学时点月 -->
+	<select id="getpointByStudentJointimeAndProxyTeacherId"
+		parameterType="cn.deepcoding.model.Student" resultType="Double">
+		SELECT point
+		FROM proxy_teacher_point WHERE startdate&lt;=#{joinTime} AND
+		enddate&gt;=#{joinTime} AND proxy_teacher_id=#{proxyTeacher.id}
+	</select>
+	<!--根据当前时间与招生老师ID获取招生老师点月 -->
+	<select id="getPointByNow"  resultType="proxyteacherpoint">
+		SELECT *
+		FROM proxy_teacher_point WHERE  startdate&lt;=NOW()AND
+		enddate&gt;=NOW() AND proxy_teacher_id=#{id}
+	</select>
+<!--根据开始于结束时间判断是否能查到点位 &lt小于    &gt大于-->
+<select id="getpointByTimeAndproxyTeacherId" resultType="Double">
+		SELECT point
+		FROM proxy_teacher_point WHERE  startdate&lt;=#{time} AND enddate&gt;=#{time} AND proxy_teacher_id=#{proxyTeacherId}
+		<if test="id != null">AND id!=#{id}</if>
+	</select>
+<!--根据录入得开始和结束时间判断是否有包含信息  -->
+<select id="getpointByProxyTeacherPoint" parameterType="cn.deepcoding.model.ProxyTeacherPoint" resultType="Integer">
+		SELECT COUNT(*)
+		FROM proxy_teacher_point WHERE  #{startDate}&lt;=startdate AND #{endDate}&gt;=enddate AND proxy_teacher_id=#{proxyTeacher.id}
+		<if test="id != null">AND id!=#{id}</if>
+	</select>
+<!--//添加招生老师的微信信息-->
+	<insert id="addProxyTeacherWatchInfo" >
+	  	INSERT into proxyteacherwatch(openid,nickname,sex,city,country,province,create_time)
+	  		VALUE(#{proxyTeacherWatch.openid},#{proxyTeacherWatch.nickname},#{proxyTeacherWatch.sex},#{proxyTeacherWatch.city},#{proxyTeacherWatch.country},#{proxyTeacherWatch.province},now())
+	</insert>
+	<insert id="boundWatch">
+		INSERT into proxyteacherid_watch_id(proxy_teacher_id,Proxy_teacher_watch_id,create_time)
+			VALUE(#{proxyTeacherId},#{watchId},now())
+
+	</insert>
+	<select id="selectIdByOpenID" resultType="Integer">
+		select id from proxyteacherwatch where openid = #{openid}
+	</select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.StudentProxyTeacherDao">
+
+	<resultMap type="StudentProxyTeacher" id="map">
+		<id property="id" column="id"/>
+		<result property="studentName" column="student_name"/>
+		<result property="studentPhone" column="student_phone"/>
+		<result property="proxyTeacherName" column="proxyteacher_name"/>
+		<result property="proxyTeacherPhone" column="proxyteacher_phone"/>
+		<result property="remark" column="remark"/>
+	</resultMap>
+	<select id="getAll" resultMap="map">
+		select * from student_proxyteacher
+		<where>
+			<if test="st.studentName!=null and st.studentName.trim()!=''">
+				and student_name like "%"#{st.studentName}"%"
+			</if>
+			<if test="st.studentPhone!=null and st.studentPhone.trim()!=''">
+				and student_phone like "%"#{st.studentPhone}"%"
+			</if>
+			<if test="st.proxyTeacherName!=null and st.proxyTeacherName.trim()!=''">
+				and proxyteacher_name like "%"#{st.proxyTeacherName}"%"
+			</if>
+		</where>
+		order by id desc
+		limit #{start},#{rows}
+	</select>
+	
+	<insert id="addStuAndProxyTeacher">
+		insert into student_proxyteacher(student_name,student_phone,proxyteacher_name,proxyteacher_phone,remark)
+		values(#{studentName},#{phone},#{teacherName},#{teacherPhone},#{remark})
+	</insert>
+</mapper>

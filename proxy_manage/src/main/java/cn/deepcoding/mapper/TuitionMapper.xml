@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.TuitionDao">
+	<resultMap type="cn.deepcoding.model.Tuition" id="TuitionResult">
+		<id property="id" column="id"/>
+		<result property="tuition" column="tuition"/>
+		<result property="incidentals" column="incidentals"/>
+		<result property="quarterage" column="quarterage"/>
+ 
+		<association property="major" column="major_id" select="cn.deepcoding.dao.MajorDao.getById"></association>
+		 <association property="studyTime" column="study_time_id" select="cn.deepcoding.dao.StudyTimeDao.getById"></association>
+ 
+<!-- 		<association property="major" column="Major" select="cn.deepcoding.dao.MajorDao.getById"></association> -->
+<!-- 		<collection property="studyTime" column="study_time" select="cn.deepcoding.dao.StudyTimeDao.getById"></collection> -->
+ 
+	</resultMap>
+	<select id="getById" resultMap="TuitionResult">
+		select * from tuition where id = #{id}
+	</select>
+	<resultMap type="Tuition" id="TuitinResult">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+	</resultMap>
+	<select id="select" resultMap="TuitinResult">
+		 select * from tuition
+	</select>
+	
+	<select id="getAll" resultMap="TuitionResult">
+		 select * from tuition
+	</select>
+	
+ 
+	
+	<select id="getTuitionId" resultMap="TuitionResult">
+		 select * from tuition where study_time_id =(select id from study_time where study_time = #{studyTime}) and major_id = #{majorId}
+	</select>
+ 	
+ 	<insert id="save">
+ 		insert into tuition(study_time_id,major_id,tuition,incidentals,quarterage) 
+ 			values(#{studyTime.id},#{major.id},#{tuition},#{incidentals},#{quarterage})
+ 	</insert>
+ 	<delete id="delete">
+ 		delete from tuition where id = #{id}
+ 	</delete>
+ 	<select id="getOneId" resultMap="TuitionResult">
+ 		select * from tuition  where id=#{id}
+ 	</select>
+ 	<update id="update">
+ 		update tuition set study_time_id = #{studyTime.id},major_id = #{major.id},tuition = #{tuition},incidentals = #{incidentals},quarterage = #{quarterage} where id = #{id}
+ 	</update>
+</mapper>
+	 

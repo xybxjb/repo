@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ExamDao">
+
+	<resultMap type="cn.deepcoding.model.Exam" id="exam">
+
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="date" property="examDate" />
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.Exam" id="exam2"
+		extends="exam">
+		<collection property="classroom" column="classroom_id"
+			select="cn.deepcoding.dao.ClassroomDao.getById" />
+		<collection property="teacher" column="teacher_id"
+			select="cn.deepcoding.dao.TeacherDao.getById" />
+		<collection property="student" column="student_id"
+			select="cn.deepcoding.dao.StudentDao.getById" />
+		<collection property="scores" column="exam_id"
+			select="cn.deepcoding.dao.ScoreDao.getById" />	
+	</resultMap>
+
+
+	<!-- 通过id获取该成绩 resultMap别改exam -->
+	<select id="getById" parameterType="java.lang.Integer"
+		resultMap="exam2">
+
+		select * from exam where id=#{id}
+
+	</select>
+
+
+	<!-- 添加考试信息 -->
+	<insert id="addExam" useGeneratedKeys="true" keyColumn="id"
+		keyProperty="id">
+
+		insert into exam (name,student_id,date,
+		<if test="teacher.id != null and teacher.id != ''">teacher_id,</if>
+		classroom_id)
+		values(#{name},#{student.id},#{examDate},
+		<if test="teacher.id != null and teacher.id != ''">#{teacher.id},</if>
+		#{classroom.id})
+
+	</insert>
+	<!-- 拿到符合该科目成绩的学生 -->
+	<select id="getCourseIdScore" resultMap="exam2">
+		select e.* from score s, exam e inner join (select
+		student_id,max(date) 'Maxdate' from exam group
+		by student_id ) b on e.student_id=b.student_id and e.date=b.Maxdate
+		and
+		e.student_id in (select id from student where simulation_classroom_id
+		is null
+		<if test="majorId!=null and majorId!=''">
+			and student.major_id= #{majorId}
+		</if>
+		<if test="classId!=null and classId!=''">
+			and student.classroom_id=#{classId}
+		</if>
+		<if test="studentName!=null and studentName!=''">
+			and student.name like "%${studentName}%"
+		</if>
+
+		)where s.exam_id = e.id
+		<if
+			test="courseId!=null and courseId!=''and highScore!=null and highScore!=''">
+			AND s.course_id = #{courseId} AND s.score > #{highScore}
+		</if>
+		group by student_id limit #{page.start},#{page.rows}
+		;
+	</select>
+
+
+	<!--通过组合查询查找考试数据 -->
+	<select id="getStudentExam" resultMap="exam2">
+		select * from exam where 1=1 and
+		student_id in (select id from student where name like "%${name}%")
+		<if test="classroomId != null">and classroom_id = #{classroomId}</if>
+		<if test="beginTime !=null and beginTime != ''">and date &gt;= #{beginTime} </if>
+		<if test="endTime   !=null and endTime != ''">and date &lt;= #{endTime}  </if>
+		<if test="examName  !=null and examName != ''">and name = #{examName} </if>
+		order by date ,name , classroom_id limit #{page.start},#{page.rows}
+	</select>
+
+	<!--获取所有考试名称 -->
+	<select id="getExamName" resultMap="exam">
+
+		select name from exam group by name;
+
+	</select>
+
+
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" resultType="Integer">
+		SELECT count(1) FROM exam ;
+	</select>
+
+	<!-- 此方法为导入excel时使用 -->
+	<insert id="addExcelExam" useGeneratedKeys="true" keyColumn="id"
+		keyProperty="id">
+		insert into exam(student_id,date,name,classroom_id,teacher_id) values(
+		(select id from student where name =
+		#{student.name}),#{examDate},#{name},
+		(select id from classroom where name = #{classroom.name}),#{teacher.id}
+		)
+	</insert>
+
+
+	<!--获取所有考试名称 -->
+	<select id="getAllExamName" resultMap="exam">
+
+		select name from exam_name ;
+
+	</select>
+
+
+
+	<select id="getOneExam" resultMap="exam">
+
+		select * from exam where name = #{name} and student_id = #{id} ;
+
+	</select>
+
+
+	<!--查看是否有考试名称 -->
+	<select id="hasExamName" resultType="java.lang.Integer">
+
+		select count(1) from exam_name where name = #{name};
+
+	</select>
+
+
+	<select id="getExamTime" resultType="java.lang.String">
+
+		select date from exam_name where name = #{name};
+
+	</select>
+
+	<!-- app -->
+	<!-- 根据 学生id 查询考试名称 -->
+	<select id="getExamByStudentId" parameterType="Integer" resultMap="exam2">
+		select * from exam where student_id=#{id}
+	</select>
+
+<!-- 根据 学生id 查询 -->
+	<select id="getByStuId" parameterType="Integer" resultMap="exam2">
+		select * from exam where student_id=#{id}
+	</select>
+</mapper>
+

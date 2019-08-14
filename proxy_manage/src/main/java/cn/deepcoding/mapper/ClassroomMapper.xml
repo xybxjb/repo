@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ClassroomDao">
+	
+	<resultMap type="cn.deepcoding.model.Classroom" id="classroomResult">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="beginTime" column="begin_time" /> 
+		<result property="endTime" column="over_time" />
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.Classroom" id="classroomResult2" extends="classroomResult">
+		<collection property="teacher" column="id" select="cn.deepcoding.dao.TeacherDao.getTeacherByClassroom"></collection>
+	</resultMap>
+	<!-- 获取所有状态为存在的班级 -->
+	<select id="getAllBe" resultMap="classroomResult">
+		select * from classroom where over_time is null
+	</select>
+	
+	<!--通过班级班级id获取该班对象 -->
+	<select id="getById" resultMap="classroomResult" useCache="true">
+		select * from classroom where id=#{id}
+	</select>
+		
+		<!-- 获取所有的班级，包括有结束时间的班级-->
+	<select id="getAll" resultMap="classroomResult2" useCache="true">
+		select * from classroom  order by begin_time desc
+	</select>
+
+	<!-- 通过班级名称查看是否有重复 -->
+	<select id="getNumbers"  resultType="java.lang.Integer">
+	select count(1) from classroom where name = #{name}
+	</select>
+	
+	<delete id="delete" flushCache="true">
+		delete from classroom where id = #{id}
+	</delete>
+	
+	<update id="update" flushCache="true">
+		update classroom set 
+		<if test="name != null and name !=''">name=#{name}</if>
+		<if test="beginTime != null and beginTime != ''">,begin_time=#{beginTime}</if>
+		<if test="endTime != null and endTime != ''">,end_time=#{endTime}</if>
+		 where id = #{id}
+	</update>
+	
+	<!-- 编辑移除老师 -->
+	<update id="updateTeacherByClassId" flushCache="true">
+		UPDATE teacher_classroom set end_time = now()   where teacher_id not in 
+		<foreach collection="teacherIds" item="teacherId" open="(" close=")" separator=",">
+				#{teacherId}
+		</foreach>
+		  and classroom_id =#{classroom.id}
+	</update>
+	<!--编辑添加老师  -->	
+	<insert id="insertTeacherByClassId" useGeneratedKeys="true" keyProperty="id" keyColumn="id" flushCache="true">
+		insert into teacher_classroom(classroom_id,teacher_id,begin_time)values(#{classroom.id},#{teacherId},CURDATE())
+	</insert>
+	
+	
+	<insert id="saveClassroom" useGeneratedKeys="true" keyProperty="id" keyColumn="id" flushCache="true">
+		insert into classroom(name,begin_time,over_time)values(#{name},#{beginTime},#{endTime})
+	</insert>
+	<insert id="saveTeacherClassroom" flushCache="true">
+		insert into teacher_classroom(classroom_id,teacher_id,begin_time,end_time)values(#{classroom.id},#{teacherId},#{classroom.beginTime},#{classroom.endTime})
+	</insert>
+	
+</mapper>
+
+

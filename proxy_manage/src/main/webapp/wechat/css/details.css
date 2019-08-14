@@ -1,0 +1,15 @@
+.details_cont p{
+	margin-top: .07rem;
+}
+.payTheFees {
+	border-color:#bfbfbf;
+	padding: 0 .1rem;
+}
+.payTheFees th,td{
+	border: none;
+	text-align: center;
+	line-height: .3rem;
+}
+.payTheFees tr{
+	border: .01rem solid #BFBFBF;
+}

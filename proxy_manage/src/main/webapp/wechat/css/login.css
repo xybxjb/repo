@@ -1,0 +1,61 @@
+body{
+	background: #fff;
+}
+.logo_img{
+	width: 45%;
+}
+.logo_img img{
+	padding-top: 1.2rem;
+}
+.user{
+	margin-top: .7rem;
+}
+.user,.pass{
+	width: 93%;
+	border-bottom: 0.01rem solid #edebeb;
+	padding: .1rem .1rem;
+}
+.user input{
+	bottom: .05rem;
+}
+.err{
+	right: 0;
+}
+.put{
+	margin-left: .2rem;
+	width: 50%;
+	border: none;
+	font-size: 0.16rem;
+	letter-spacing: .01rem;
+	line-height: .3rem;
+}
+.pass{
+	margin-top: .2rem;
+}
+.pass input{
+	bottom: .07rem;
+	margin-left: .25rem;
+}
+.gain{
+	right: 0;
+	bottom: .09rem;
+	font-size: 0.16rem;
+	color:#f2d743
+}
+.logo_put{
+	margin-top: .5rem;
+	width: 70%;
+	line-height: .4rem;
+	border-radius: .5rem;
+	border: none;
+	color: #fff;
+	font-size: .16rem;
+	background: #11b7ff;
+	letter-spacing: .01rem;
+}
+/*欢迎登陆*/
+.logo_information p{
+	padding-left: .2rem;
+	margin-bottom: .1rem;
+	letter-spacing: .01rem;
+}

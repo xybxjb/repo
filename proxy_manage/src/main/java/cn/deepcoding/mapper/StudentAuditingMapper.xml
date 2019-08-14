@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.StudentAuditingDao">
+	<!-- 二级缓存 -->
+
+	<resultMap type="cn.deepcoding.model.StudentAuditing" id="StudentAuditingResult">
+		<id property="id" column="id"/>
+		<result property="auditor" column="auditor"/>
+		<result property="auditTime" column="audit_time"/>
+		<result property="auditStatus" column="audit_state"/>
+		<result property="remarks" column="remarks"/>
+		<result property="studentId" column="student_id"/>
+	</resultMap>
+	
+	
+	<select id="findStudentAuditingById"  resultMap="StudentAuditingResult">
+	
+	select * from student_auditing where student_id = #{studentId}
+	
+	</select>
+	
+	
+	
+	<select id="getTotal" resultType="int">
+		select count(1)from student_auditing where 1=1
+		<include refid="selectSql"></include>
+	</select>
+	<select id="list" resultMap="StudentAuditingResult">
+		select * from student_auditing
+		<include refid="selectSql"></include>
+		limit #{page.start},#{page.rows}
+	</select>
+	<sql id="selectSql">
+		<if test="studentAuditing.auditor != null and studentAuditing.auditor.trim()!=''"> and auditor like concat('%',#{studentAuditing.auditor},'%')</if>
+		<if test="studentAuditing.auditorTime != null"> and audit_time like concat('%',#{studentAuditing.auditorTime},'%')</if>
+		<if test="studentAuditing.auditStatus != null and studentAuditing.auditStatus.trim()!=''"> and audit_state like concat('%',#{studentAuditing.auditStatus},'%')</if>
+		<if test="studentAuditing.remarks != null and studentAuditing.remarks.trim()!=''"> and remarks like concat('%',#{studentAuditing.remarks},'%')</if>
+		<if test="studentAuditing.studentId != null and studentAuditing.studentId.trim()!=''"> and student_id like concat('%',#{studentAuditing.studentId},'%')</if>
+	</sql>
+	<!-- 如果保存成功的话，返回该条数据的id -->
+	<insert id="save"   useGeneratedKeys="true"   keyProperty="id"   keyColumn="id">
+		insert into student_auditing(auditor,audit_time,audit_state,remarks,student_id)values(#{auditor},#{auditTime},#{auditStatus},#{remarks},#{studentId})
+	</insert>
+</mapper>

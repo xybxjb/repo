@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.UsersDao">
+	<resultMap type="users" id="usersResultMap">
+		<id property="id" column="id" />
+		<result property="username" column="user_name" />
+		<result property="password" column="password" />
+		<result property="available" column="available" />
+		<result property="fackToken" column="face_token" />
+		<collection property="roles" column="id" select="cn.deepcoding.dao.RolesDao.getRoleByUserId"></collection>
+	</resultMap>
+
+	<!-- 查询所有 -->
+	<select id="getAll" parameterType="cn.deepcoding.model.Users"
+		resultMap="usersResultMap">
+		select * from users
+		<where>
+			<if test="users.username != null and users.username != ''">
+				user_name like concat("%",#{username},"%")
+			</if>
+		</where>
+		limit #{page.start},#{page.rows};
+	</select>
+
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.Users"
+		resultType="Integer">
+		SELECT count(1) FROM users ;
+	</select>
+	<!-- 根据id 查询 -->
+	<select id="getById" parameterType="Integer" resultMap="usersResultMap">
+		select *
+		from users where id=#{id}
+	</select>
+	<!-- 根据id2 查询 -->
+	<select id="getById2" parameterType="Integer" resultMap="usersResultMap">
+		select *
+		from users where id=#{id}
+	</select>
+	<!-- 根据 名称查询 -->
+	<select id="getByName" parameterType="String" resultMap="usersResultMap">
+		select
+		* from users where user_name=#{username}
+	</select>
+	<!-- 修改 -->
+	<update id="update" parameterType="cn.deepcoding.model.Users">
+		update users set
+		name=#{name}
+		where id=#{id}
+	</update>
+	<!-- 添加 -->
+	<insert id="addUser" parameterType="cn.deepcoding.model.Users"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		users(user_name,password,available,name)
+		values(#{username},#{password},#{available},#{name})
+	</insert>
+	<!-- 删除 -->
+	<delete id="del" parameterType="Integer">
+		delete from users where id=#{id}
+	</delete>
+	<!-- 修改 -->
+	<update id="newPass" parameterType="cn.deepcoding.model.Users">
+		update users set
+		password=#{password}
+		where
+		id=#{id}
+	</update>
+	<!-- 修改百度云人脸唯一识别码 -->
+	<update id="updatefacatokenByid" parameterType="cn.deepcoding.model.Users">
+		update users set
+		face_token=#{fackToken}
+		where
+		id=#{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.AreaDao">
+	<!-- 开启二级缓存 -->
+	<cache /> 
+	<resultMap type="cn.deepcoding.model.Area" id="AreaResult">
+		<id property="code" column="code"></id>
+		<result property="name" column="name"/>
+		<result property="perentCode" column="perent_code"/>
+	</resultMap>
+
+	<select id="getAll" resultMap="AreaResult" useCache="true">
+		select * from area  
+	</select>
+</mapper>

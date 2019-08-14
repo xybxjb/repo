@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.EmergencyPersonDao">
+
+	<resultMap type="cn.deepcoding.model.EmergencyPerson" id="emergencyPerson">
+		<id property="id" column="id"/>
+		<result  property="name"  column="name"/>
+		<result  property="tel"   column="tel"/>
+		<result  property="relation"  column="relation"/>
+	</resultMap>
+	<resultMap type="cn.deepcoding.model.EmergencyPerson" id="emergencyPerson2" extends="emergencyPerson">
+		<association property="student"  column="student_id"  select="cn.deepcoding.dao.StudentDao.getById"></association>
+	</resultMap>
+	
+	<insert id="save" >
+		
+		insert into emergency_person (name,tel,relation,student_id)values(#{name},#{tel},#{relation},#{student.id})
+			
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="deleteemergencyPerson" parameterType="Integer">
+		delete from emergency_person where student_id=#{id}
+	</delete>
+	
+	
+	<update id="updateemergencyPerson" >
+		update emergency_person set tel=#{xdianhua} where student_id=#{id}
+	</update>
+</mapper>

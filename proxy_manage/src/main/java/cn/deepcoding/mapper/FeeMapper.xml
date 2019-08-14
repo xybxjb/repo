@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.FeeDao">
+
+	<resultMap type="cn.deepcoding.model.Fee" id="feeResult">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="amount" property="amount" />
+		<result column="initialResideDate" property="initialResideDate"/>
+		<result column="remarks" property="remarks" />
+		<result column="payment_time" property="paymentTime" />
+		<association property="payment" column="payment_id"
+			select="cn.deepcoding.dao.PaymentDao.getById"></association>
+			<association property="student" column="student_id"
+			select="cn.deepcoding.dao.StudentDao.getById"></association>
+			<association property="feeDueTime" column="fee_due_time_id"
+			select="cn.deepcoding.dao.FeeDueTimeDao.getById"></association>
+	</resultMap>
+	
+	<resultMap type="cn.deepcoding.model.Fee" id="feeResult2">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="amount" property="amount" />
+		<result column="initialResideDate" property="initialResideDate"/>
+		<result column="remarks" property="remarks" />
+		<result column="payment_time" property="paymentTime" />
+		<association property="payment" column="payment_id"
+			select="cn.deepcoding.dao.PaymentDao.getById"></association>
+	</resultMap>
+	
+ 
+ <!-- 王晓宇 -->
+<insert id="save" parameterType="cn.deepcoding.model.Fee" >
+    insert into fee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+
+      <if test="initialResideDate != null and initialResideDate!=''" >
+
+        initialResideDate,
+      </if>
+      <if test="paymentTime != null" >
+        payment_time,
+      </if>
+       <if test="remarks != null" >
+        remarks,
+      </if>
+      	fee_due_time_id,
+      	fee_type_id,
+        payment_id,
+        student_id,
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="type != null" >
+        #{type},
+      </if>
+      <if test="amount != null" >
+        #{amount},
+      </if>
+
+      <if test="initialResideDate != null and initialResideDate !=''" >
+        #{initialResideDate},
+      </if>
+      <if test="paymentTime != null" >
+        #{paymentTime},
+      </if>
+       <if test="remarks!= null" >
+        #{remarks},
+      </if>
+      #{feeDueTime.id},
+      #{feeType.id},
+        #{payment.id},
+        #{student.id},
+    </trim>
+  </insert>
+  
+   <!-- 王晓宇 -->
+  <select id="countTuition" resultType="java.lang.String">
+		select SUM(amount) from fee where student_id = #{stuId} and type = #{type}
+  </select>
+
+  <!-- 王晓宇 -->
+ 	<select id="selectFee" resultType="cn.deepcoding.model.Fee">
+		select * from fee where student_id = #{studentId}
+	</select>
+ 
+ 
+ 
+ 
+ <!-- 王晓宇 -->
+<select id="select" resultMap="feeResult">
+
+SELECT
+*
+FROM
+	fee f
+	 
+WHERE
+f.student_id =#{id} order by payment_time
+
+
+</select>
+
+<!-- 陈雪珍 -->
+ <select id="feeSelect" resultType="int">
+ 
+ 		select sum(amount) from fee where student_id = #{studentId} and type= "学费"
+ </select>
+
+<!-- 根据学生编号获取部分信息 -->
+<select id="getFeeByStudentId"   resultMap="feeResult2">
+	select * from fee where student_id =#{id} and type= "学费"
+	limit #{page.start},#{page.rows}
+</select>
+ <!-- 根据学生编号获取部分信息的个数 -->
+ <select id="getFeeCountByStudentId" parameterType="Integer" resultType="Integer">
+ 	select count(1) from fee where student_id =#{id}
+ </select>
+ 
+ <!-- app -->
+ <!-- 根据学生编号获取部分信息  -->
+ <select id="getFeeByStudentId2"   resultMap="feeResult2">
+	select amount,payment_time,payment_id from fee where student_id =#{id} and type= "学费"
+</select>
+<select id="getInittime" parameterType="Integer" resultMap="feeResult2">
+	select * from fee where type="住宿费" and student_id=#{id} and id=(select max(id) from fee where type="住宿费" and student_id=#{id})
+</select>
+
+<select id="hasFeeTypeInfo" resultType="integer">
+	select count(1) from fee where fee_type_id = #{feeTypeId}
+</select>
+</mapper> 
+
+

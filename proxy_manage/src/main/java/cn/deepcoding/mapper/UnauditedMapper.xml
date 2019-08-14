@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.UnauditedDao">
+	<resultMap type="cn.deepcoding.model.Unaudited" id="UnauditedResult" >
+	    <result column="audit_state"          property="auditState"/>
+	    <result column="bill_amount"          property="billAmount"/>
+	    <result column="amount_reported"  	  property="amountReported"/>
+	    <result column="remarks" 		 	  property="remarks"/>
+	 	<result column="actual_object"    	  property="actualObject"/>
+	    <result column="actual_object_tel"    property="actualObjectTel"/>
+		<result column="ticket_voucher" 	  property="ticketVoucher"   />
+	   	<association property="proxyTeacher" 	 column="student_id"  select="cn.deepcoding.dao.ProxyTeacherDao.getOneProxyTeacher"></association>
+	   	<association property="amount" 			 column="student_id"  select="cn.deepcoding.dao.FeeDao.feeSelect"></association>
+	    <association property="student"   		 column="student_id"  select="cn.deepcoding.dao.StudentDao.getById"></association>
+	    <association property="studentAuditings"  column="student_id"  select="cn.deepcoding.dao.StudentAuditingDao.findStudentAuditingById"></association>
+	</resultMap>
+
+	<select id="list" resultMap="UnauditedResult">
+		select * from student_reimbursement where audit_state = #{id} 
+		<if test="studentName!=null and studentName.trim()!=''">and student_id in (select id from student where name like "%${studentName}%")</if>
+		<if test="className!=null and className.trim()!=''">and student_id in(select id from student where classroom_id = (select id from classroom where name =#{className}))</if>
+		<if test="startTime!=null and startTime!=''">and student_id in (select id from student where join_time &gt; #{startTime})</if>
+		<if test="endTime !=null and endTime!=''  ">and student_id in (select id from student where join_time &lt; #{endTime})</if>
+		limit #{page.start},#{page.rows}
+		
+	</select>
+	
+	<select id="getById" resultMap="UnauditedResult">
+		select * from student_reimbursement where student_id = #{id}
+	</select>
+	
+	<update id="update" parameterType="Unaudited" >
+		update student_reimbursement set
+		<!-- trim方法把name字符串头尾的空格去掉 -->
+		<if test="actualObject!=null and actualObject.trim()!=''">
+			 actual_object = #{actualObject},
+		</if>
+		<if test="actualObjectTel!=null and actualObjectTel.trim()!=''">
+			 actual_object_tel = #{actualObjectTel},
+		</if>
+		<if test="amountReported!=null">
+			amount_reported = #{amountReported},
+		</if>
+		<if test="billAmount!=null">
+			bill_amount = #{billAmount},
+		</if>
+		<if test="ticketVoucher!=null and ticketVoucher.trim()!=''">
+			ticket_voucher = #{ticketVoucher},
+		</if>
+		remarks = #{remarks},
+		
+		audit_state = 0 where student_id=#{student.id}
+	</update>
+	
+	
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" resultType="Integer">
+		SELECT count(1) FROM student_reimbursement ;
+	</select>
+	
+</mapper>

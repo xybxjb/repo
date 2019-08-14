@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.deepcoding.dao.DormitoryDao">
+	<resultMap type="cn.deepcoding.model.Dormitory" id="FindstudengDormitory1">
+		<id property="id" column="id" />
+		<result property="number" column="number" />
+		<result property="total" column="total" />
+		<result property="sex" column="sex" />
+		<result property="time" column="create_time" />
+		<result property="note" column="note" />
+		<result property="adress" column="adress" />
+		<result property="hidden" column="hidden_delete" />
+
+</resultMap>
+<resultMap type="cn.deepcoding.model.Dormitory" id="FindstudengDormitory" extends="FindstudengDormitory1">
+<collection property="studentdormitory" column="id"
+			select="cn.deepcoding.dao.StudentDormitoryDao.FindStudentDormitoryBydid"></collection> 
+</resultMap>
+<insert id="DormitoryAdd" parameterType="cn.deepcoding.model.Dormitory">
+		INSERT INTO dormitory(number,total,sex,create_time,<if test="note!=null">note,</if>adress) VALUES(#{number},#{total},0,#{time},
+		<if test="note!=null">#{note},</if>
+		#{adress});
+	</insert>
+	<select id="FindDormitoryAll" resultMap="FindstudengDormitory">
+
+		SELECT * FROM dormitory WHERE hidden_delete IS NULL
+		<if test="dormitory.id!=null">
+			AND id=#{dormitory.id}
+		</if>
+		<if test="dormitory.number!=null">
+			AND number=#{dormitory.number}
+		</if>
+		<if test="dormitory.sex!=null">
+			AND sex=#{dormitory.sex}
+		</if>
+
+		limit #{page.start},#{page.rows}
+		;
+	</select>
+	<select id="FindDormitorynumber" resultMap="FindstudengDormitory">
+
+		SELECT * FROM
+		dormitory WHERE hidden_delete IS NULL;
+	</select>
+	<!-- 查询分页个数 -->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.Dormitory"
+		resultType="Integer">
+		SELECT count(1) FROM dormitory WHERE hidden_delete IS NULL;
+	</select>
+
+
+	<select id="GetById" resultMap="FindstudengDormitory">
+
+		SELECT * FROM dormitory WHERE
+		id=#{id} ;
+	</select>
+	
+
+	<update id="DormitoryUpdate">
+		update dormitory
+		<trim prefix="set" suffixOverrides=",">
+			<if test="number != null ">number=#{number},</if>
+			<if test="total != null ">total=#{total},</if>
+			<if test="sex != null ">sex=#{sex},</if>
+			<if test="time != null ">create_time=#{time},</if>
+			<if test="note != null ">note=#{note},</if>
+			<if test="adress != null ">adress=#{adress},</if>
+			<if test="hidden != null ">hidden_delete=#{hidden},</if>
+		</trim>
+		where id=#{id}
+	</update>
+
+<select id="GetStudentId" resultMap="FindstudengDormitory1">
+	select * from dormitory where id=#{id}
+</select>
+
+</mapper>
+	

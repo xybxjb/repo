@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyTeacherWatchDao">
+
+	<resultMap type="cn.deepcoding.model.ProxyTeacherWatch" id="ProxyTeacherWatch">
+		<id column="id" property="id" />
+		<result column="openid" property="openid" />
+		<result column="nickname" property="nickname" />
+		<result column="sex" property="sex" />
+		<result column="city" property="city" />
+		<result column="country" property="country" />
+		<result column="province" property="province" />
+		<association property="proxyteacheridandwatchid" column="id"
+			select="cn.deepcoding.dao.ProxyTeacheridAndWatchidDao.getByWatchid"></association>
+
+	</resultMap>
+	<!-- 通过用户访问，判断用户的oppenid是否存在数据库中 -->
+	<select id="FindProxyTeacherWatchByOppenid" parameterType="String"
+		resultMap="ProxyTeacherWatch">
+		SELECT * FROM proxyteacherwatch WHERE openid=#{openid}
+	</select>
+	<!-- 向内添加oppenid等信息 -->
+	<insert id="ProxyTeacherWatchAdd" parameterType="cn.deepcoding.model.ProxyTeacherWatch"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		proxyteacherwatch(openid,nickname,sex,city,country,province)
+		VALUES(#{openid},#{nickname},#{sex},#{city},#{country},#{province});
+
+	</insert>
+	<!-- 通过oppenid删除原有信息 -->
+	<delete id="DeleteProxyTeacherWatchByoppenId" parameterType="String">
+	DELETE FROM proxyteacherwatch WHERE openid=#{oppenid};
+	</delete>
+	
+
+</mapper>

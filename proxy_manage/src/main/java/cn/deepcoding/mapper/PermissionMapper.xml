@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.PermissionDao">
+	<cache></cache>
+	<resultMap type="Permission" id="Permission">
+		<id property="cid" column="cid"/>
+		<result property="id" column="id"/>
+		<result property="pId" column="pid"/>
+		<result property="text" column="text"/>
+		<result property="state" column="state"/>
+		<result property="url" column="url"/>
+		<result property="resource" column="resource"/>
+		<result property="perCode" column="perCode"/>
+		<result property="description" column="description"/>
+		<result property="available" column="available"/>
+	</resultMap>
+	<!-- 查找所有的权限 -->
+	<select id="selectPermission" parameterType="Permission" resultMap="Permission">
+		select * from permission
+	</select>
+	<!-- 根据id 查询 -->
+	<select id="getById" parameterType="int" resultMap="Permission">
+		select * from permission where cid=#{id}
+	</select>
+	<!-- 查询所有 -->
+	<select id="getAll" parameterType="Permission" resultMap="Permission">
+		select * from permission
+		<where>
+			<if test="text != null and text != ''">
+				text like concat("%",#{text},"%")
+			</if>
+		</where>
+	</select>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="Permission">
+		update permission set id=#{permission.id},pid=#{permission.pId},text=#{permission.text},state=#{permission.state},resource=#{permission.resource},perCode=#{permission.perCode},description=#{permission.description},
+		available=#{permission.available} where cid=#{permission.cid}
+	</update>
+	<!-- 添加 -->
+	<insert id="addPermission" parameterType="Permission">
+		insert into permission(id,pid,text,state,resource,perCode,description,available) values(#{permission.id},#{permission.pId},#{permission.text},#{permission.state},#{permission.resource},#{permission.perCode},#{permission.description},#{permission.available})
+	</insert>
+	<!-- 添加 -->
+	<insert id="addPermission2" parameterType="Permission">
+		insert into permission(id,text,state,resource,perCode,description,available) values(#{permission.id},#{permission.text},'closed',#{permission.resource},#{permission.perCode},#{permission.description},#{permission.available})
+	</insert>
+	<!-- 删除 -->
+	<delete id="del" parameterType="Integer">
+		delete from permission where cid=#{id}
+	</delete>
+	<delete id="deleteByPermissionId" parameterType="Integer">
+		delete from roles_permissions where permission_id=#{id}
+	</delete>
+	
+	
+	<select id="getPid" resultMap="Permission">
+		select * from permission where state='closed'
+	</select>
+	
+	<select id="getByCid" resultMap="Permission">
+		select * from permission where cid=#{permission.cid}
+	</select>
+	
+	<select id="getRolesIdToPermission" resultMap="Permission">
+		SELECT p.* FROM permission p JOIN roles_permissions rp ON rp.permission_id = p.cid JOIN roles r on r.id = rp.role_id AND r.id = #{id};
+	</select>
+	
+	<select id="getUserIdAndRolesIdToPermission" resultMap="Permission">
+		SELECT p.* FROM users u 
+		JOIN users_roles ur ON ur.user_id = u.id AND u.id = #{uid}
+		JOIN roles r ON ur.role_id = r.id AND r.id = #{rid}
+		JOIN roles_permissions rp ON rp.role_id = r.id
+		JOIN permission p ON rp.permission_id = p.cid;
+	</select>
+	
+	
+	
+</mapper>

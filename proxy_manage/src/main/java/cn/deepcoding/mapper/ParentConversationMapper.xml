@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.deepcoding.dao.ParentConversationDao">
+	<resultMap type="cn.deepcoding.model.ParentConversation" id="parentConversationResult">
+		<id property="id" column="id"/>
+		<result property="studentParent" column="student_parent"/>
+		<result property="teacherName" column="teacher_name"/>
+		<result property="reason" column="reason"/>
+		<result property="conversationTime" column="conversation_time"/>
+		<result property="pic" column="pic"/>
+		<association property="student" column="student_id" select="cn.deepcoding.dao.StudentDao.getById"></association>
+	</resultMap>
+	<!-- 查询所有家长谈话记录信息 -->
+	<select id="getAll" parameterType="cn.deepcoding.model.ParentConversation" resultMap="parentConversationResult">
+		select * from parent_conversation AS a INNER JOIN (SELECT id FROM student as b
+		<where>
+			<if test="parentConversation.student != null and parentConversation.student.name != null">
+				b.name like concat("%",#{parentConversation.student.name},"%")
+			</if>
+		</where>
+		)
+		b ON a.student_id=b.id
+		limit #{page.start},#{page.rows}
+	</select>
+	<!-- 分页查询 个数-->
+	<select id="getAllCount" parameterType="cn.deepcoding.model.ParentConversation" resultType="Integer">
+		select count(1) from parent_conversation AS a INNER JOIN (SELECT id FROM student as b
+		<where>
+			<if test="student != null and student.name != ''">
+				b.name like concat("%",#{student.name},"%")
+			</if>
+		</where>
+			)
+			b ON a.student_id=b.id
+	</select>
+	<!-- 根据id 查询 -->
+	<select id="getById" parameterType="Integer" resultMap="parentConversationResult">
+		select * from parent_conversation where id=#{id}
+	</select>
+	<!-- 修改信息 -->
+	<update id="updateParentConversation"  >
+		update parent_conversation set student_id=#{student.id},student_parent=#{studentParent},teacher_name=#{teacherName},reason=#{reason},
+		conversation_time=#{conversationTime},pic=#{pic} where id=#{id}
+	</update>
+	<!-- 添加谈话记录 -->
+	<insert id="AddParentConversation" parameterType="cn.deepcoding.model.StudentConversation">
+		insert into parent_conversation (id,student_id,student_parent,teacher_name,reason,conversation_time,pic)
+		 values(#{id},#{student.id},#{studentParent},#{teacherName},#{reason},#{conversationTime},#{pic})
+	</insert>
+	<!-- 删除学生信息 -->
+	<delete id="deleteParentConversation" parameterType="Integer">
+		delete from parent_conversation where id=#{id}
+	</delete>
+</mapper>

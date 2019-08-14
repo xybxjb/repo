@@ -1,0 +1,160 @@
+@CHARSET "UTF-8";
+	#ss span{
+	margin-left:7px;
+	}
+	.col-md-3{
+		width: 60%;
+		height:35px;
+		border:1px solid #95B8E7;
+		text-align:justify;
+		margin-bottom:10px;
+		margin-left:120px;
+	}
+	label{
+		font-weight:400;
+		width:62px;
+		text-align:justify;
+	}
+	.come .textbox{
+	
+	margin-top:-11px;
+	}
+	.col-md-3 label{
+		font-weight:400;
+		width:110px;
+		height:34px;
+		float:left;
+		line-height:33px;
+		border-right:1px solid #95B8E7;
+		padding-right:10px;
+		margin-bottom:0;
+ 	}
+	 label span{
+		display:inline-block;
+  		width:100%;
+	}
+	.col-md-12{
+		border:1px solid #95B8E7;
+	}
+	
+	.ui_font{
+		float:left;
+		margin:0;
+		margin-top:8px;
+	}
+	.form_fieldset .searchdiv input{
+		margin-top:8px;
+	}
+	.textbox{
+		margin-top:7px;
+	}
+	 .picture{
+	   padding-left:7px;
+	   margin-top:7px;
+	   margin-left:97px;
+	} 
+	.picture label{
+		font-weight:400;
+		width:90px;
+		height:148px;
+		float:left;
+		line-height:56px;
+		border-right:1px solid 	#95B8E7;
+		padding-right:18px;
+		
+	}
+	.bitian{
+			color:red;
+			float:left;
+			position: absolute;
+			right:328px;
+			top:3px;
+	}
+	.bitia{
+			color:red;
+			float:left;
+			position: absolute;
+			right:862px;
+			top:3px;
+	}
+	.bi{
+			color:red;
+			float:left;
+			position: absolute;
+			right:1050px;
+			top:565px;
+	}
+	.text{
+			margin-left:-12px;
+			line-height:14px;
+			border:0;
+	}
+	.jinji {
+			border:1px solid #95B8E7;
+			width:77%;
+		    margin-left: 105px;
+		    height: 47px;
+		    margin-bottom: 25px;
+		    margin-top:26px;
+	}
+	.newjinji{
+			width: 60%;
+			height:35px;
+			border:1px solid #95B8E7;
+			text-align:justify;
+			margin-bottom:10px;
+			margin-left:120px;
+	}
+
+	
+   .jinName{
+			width:153px;
+			border-radius:5px;
+			border:1px solid #95B8E7;
+			float:left;
+			margin-top:12px;
+	}
+	.jinTel{
+			width:153px;
+			border-radius:5px;
+			border:1px solid #95B8E7;
+			float:left;
+			margin-top:12px;
+	}
+	.jinGuan {
+			width:153px;
+			border-radius:5px;
+			border:1px solid #95B8E7;
+			float:left;
+			margin-top:12px;
+	}
+	#remarks {
+			border:1px solid #95B8E7;
+			width:77%;
+		    margin-left: 105px;
+		    height: 47px;
+		    margin-bottom: 25px;
+		    margin-top:26px;
+	}
+	#jinji label{
+		margin-top:12px;
+		margin-right:7px;
+	}	
+  	.filebox{  
+  			display:block;  
+  			margin:0 auto;  
+  			position: relative;  	  
+ 		} 
+	.l-btn-text label{
+		margin-top:4px;
+		font-size: 15px;
+		font-weight: 900;
+		color:#6d88ac;
+	}
+	#fileblock label{
+		font-size: 15px;
+		font-weight: 900;
+		color: #6d88ac;
+		width: 40px;
+		border-right: none;
+	}

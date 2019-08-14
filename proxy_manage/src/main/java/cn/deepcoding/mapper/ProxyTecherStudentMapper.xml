@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.deepcoding.dao.ProxyTecherStudentDao">
+	<resultMap type="ProxyTeacherHistory" id="HistoryMapper">
+		<id property="id" column="id"/>
+		<result property="proxyteacherId" column="proxyteacher_id"/>
+		<result property="proxyteacherName" column="proxyteacher_name"/>
+		<result property="studentId" column="student_id"/>
+		<result property="studentName" column="student_name"/>
+		<result property="studentTuitionAmount" column="student_tuition_amount"/>
+		<result property="commissionPoint" column="commission_point"/>
+		<result property="commissionAmount" column="commission_amount"/>
+		<result property="commissionDate" column="commission_date"/>
+	</resultMap>
+	
+		
+	<select id="find" resultMap="HistoryMapper">
+		select * from proxyteacher_commission_history where year(commission_date)=#{year} and month(commission_date)=#{month} and proxyteacher_id in
+		<foreach collection="ids" index="index" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+		  limit #{page.start},#{page.rows}  
+	</select>
+	
+	<select id="get" resultMap="student" >
+		select * from student where id=#{id}
+	</select>
+	<insert id="save" parameterType="ProxyTeaMonth">
+		insert into proxyteacher_month (
+		<trim suffixOverrides=",">
+			<if test="proxyTeacherId != null">proxyteacher_id,</if>
+			<if test="proxyTeacherName !=null and proxyTeacherName != ''" >proxyteacher_name,</if>
+			<if test="commissionPoint != null">commission_point,</if>
+			<if test="commissionAmount !=null">commission_amount,</if>
+			<if test="commissionDate !=null">commission_date,</if>
+			<if test="remarks != null and remarks != ''">remarks,</if>
+			<if test="state != null and state != ''">state,</if>
+		</trim>
+		) values(
+			<trim suffixOverrides=",">
+				<if test="proxyTeacherId != null">#{proxyTeacherId},</if>
+				<if test="proxyTeacherName !=null and proxyTeacherName != ''" >#{proxyTeacherName},</if>
+				<if test="commissionPoint != null">#{commissionPoint},</if>
+				<if test="commissionAmount !=null">#{commissionAmount},</if>
+				<if test="commissionDate !=null">#{commissionDate},</if>
+				<if test="remarks != null and remarks != ''">#{remarks},</if>
+				<if test="state != null and state != ''">#{state},</if>
+			</trim>
+		)
+		
+	</insert>
+	
+	<resultMap type="cn.deepcoding.model.Student" id="student">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="sex" property="sex"/>
+		<result column="age" property="age"/>
+		<result column="idcard" property="idCard"/>
+		<result column="birthday" property="birthday"/>
+		<result column="tel" property="tel"/>
+		<result column="address" property="address"/>
+		<result column="join_time" property="joinTime"/>
+		<result column="relation" property="relation"/>
+		<result column="idcard_pic" property="idCardPic"/>
+		<result column="unpaiTuition" property="unpai_tuition"/>
+		<association property="classroom" column="classroom_id" select="cn.deepcoding.dao.ClassroomDao.getById"/>
+		<association property="teacher" column="teacher_id" select="cn.deepcoding.dao.TeacherDao.getById"/>
+	</resultMap>
+	
+	<select id="getTotal" resultType="integer">
+		select count(1) from (select * from proxyteacher_commission_history where year(commission_date)=#{year} and month(commission_date)=#{month} and proxyteacher_id in
+		<foreach collection="ids" index="index" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>)aa
+	</select>
+</mapper>
